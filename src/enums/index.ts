@@ -10,6 +10,18 @@ export const enum ActionType {
   Code = 'code',
 }
 
+export const enum MultiAvatarMode {
+  Single = 'single',
+  Multiple = 'multiple',
+}
+
+export enum MultiAvatarPreset {
+  Couple = 'couple',
+  FamilyOf3 = 'familyOf3',
+  FamilyOf4 = 'familyOf4',
+  Custom = 'custom',
+}
+
 export const enum Gender {
   Male = 'male',
   Female = 'female',

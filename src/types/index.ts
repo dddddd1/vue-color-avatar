@@ -13,6 +13,7 @@ import {
   type Gender,
   type GlassesShape,
   type MouthShape,
+  type MultiAvatarPreset,
   type NoseShape,
   type TopsShape,
   type WrapperShape,
@@ -50,6 +51,30 @@ export interface AvatarOption {
   }
 
   widgets: Partial<AvatarWidgets>
+}
+
+export interface AvatarPosition {
+  x: number
+  y: number
+  scale: number
+  rotation: number
+}
+
+export interface MultiAvatarItem {
+  id: string
+  option: AvatarOption
+  position: AvatarPosition
+  visible: boolean
+}
+
+export interface MultiAvatarConfig {
+  preset: MultiAvatarPreset
+  avatars: MultiAvatarItem[]
+  background: {
+    color: string
+    borderColor: string
+  }
+  wrapperShape: `${WrapperShape}`
 }
 
 export interface AvatarSettings {

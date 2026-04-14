@@ -11,6 +11,7 @@ import {
   Gender,
   GlassesShape,
   MouthShape,
+  MultiAvatarPreset,
   NoseShape,
   TopsShape,
   WidgetType,
@@ -224,5 +225,46 @@ export const SHAPE_STYLE_SET = {
   [WrapperShape.Squircle]: {
     // TODO: Radius should adapt to the avatar size
     borderRadius: '25px',
+  },
+}
+
+export const MULTI_AVATAR_PRESETS: Readonly<{
+  [key in MultiAvatarPreset]: {
+    count: number
+    positions: { x: number; y: number; scale: number; rotation: number }[]
+    name: string
+  }
+}> = {
+  [MultiAvatarPreset.Couple]: {
+    count: 2,
+    positions: [
+      { x: -60, y: 0, scale: 0.85, rotation: 0 },
+      { x: 60, y: 0, scale: 0.85, rotation: 0 },
+    ],
+    name: 'couple',
+  },
+  [MultiAvatarPreset.FamilyOf3]: {
+    count: 3,
+    positions: [
+      { x: -80, y: 20, scale: 0.75, rotation: 0 },
+      { x: 0, y: -30, scale: 0.85, rotation: 0 },
+      { x: 80, y: 20, scale: 0.75, rotation: 0 },
+    ],
+    name: 'familyOf3',
+  },
+  [MultiAvatarPreset.FamilyOf4]: {
+    count: 4,
+    positions: [
+      { x: -70, y: -40, scale: 0.7, rotation: 0 },
+      { x: 70, y: -40, scale: 0.7, rotation: 0 },
+      { x: -70, y: 50, scale: 0.7, rotation: 0 },
+      { x: 70, y: 50, scale: 0.7, rotation: 0 },
+    ],
+    name: 'familyOf4',
+  },
+  [MultiAvatarPreset.Custom]: {
+    count: 0,
+    positions: [],
+    name: 'custom',
   },
 }

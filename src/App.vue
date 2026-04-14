@@ -8,12 +8,21 @@
           <div class="playground">
             <div class="avatar-wrapper">
               <VueColorAvatar
+                v-if="multiAvatarMode === MultiAvatarMode.Single"
                 ref="colorAvatarRef"
                 :option="avatarOption"
                 :size="280"
                 :style="{
                   transform: `rotateY(${flipped ? -180 : 0}deg)`,
                 }"
+              />
+              <VueColorAvatarMulti
+                v-else
+                ref="colorAvatarMultiRef"
+                :config="multiAvatarConfig"
+                :size="400"
+                :selected-avatar-index="selectedAvatarIndex"
+                @select-avatar="handleSelectAvatar"
               />
             </div>
 
@@ -79,13 +88,18 @@
     />
 
     <Sider>
-      <Configurator />
+      <template v-if="multiAvatarMode === MultiAvatarMode.Single">
+        <Configurator />
+      </template>
+      <template v-else>
+        <MultiConfigurator />
+      </template>
     </Sider>
   </main>
 </template>
 
 <script lang="ts" setup>
-import { ref, watchEffect } from 'vue'
+import { computed, ref, watchEffect } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import ActionBar from '@/components/ActionBar.vue'
@@ -93,17 +107,21 @@ import Configurator from '@/components/Configurator.vue'
 import BatchDownloadModal from '@/components/Modal/BatchDownloadModal.vue'
 import CodeModal from '@/components/Modal/CodeModal.vue'
 import DownloadModal from '@/components/Modal/DownloadModal.vue'
+import MultiConfigurator from '@/components/MultiConfigurator.vue'
 import VueColorAvatar, {
   type VueColorAvatarRef,
 } from '@/components/VueColorAvatar.vue'
-import { ActionType } from '@/enums'
+import VueColorAvatarMulti, {
+  type VueColorAvatarMultiRef,
+} from '@/components/VueColorAvatarMulti.vue'
+import { ActionType, MultiAvatarMode } from '@/enums'
 import { useAvatarOption } from '@/hooks'
 import Container from '@/layouts/Container.vue'
 import Footer from '@/layouts/Footer.vue'
 import Header from '@/layouts/Header.vue'
 import Sider from '@/layouts/Sider.vue'
 import { useStore } from '@/store'
-import { REDO, UNDO } from '@/store/mutation-type'
+import { REDO, SET_SELECTED_AVATAR_INDEX, UNDO } from '@/store/mutation-type'
 import {
   getRandomAvatarOption,
   getSpecialAvatarOption,
@@ -124,24 +142,40 @@ const store = useStore()
 
 const [avatarOption, setAvatarOption] = useAvatarOption()
 
+const multiAvatarMode = computed(() => store.multiAvatarMode)
+const multiAvatarConfig = computed(() => store.multiAvatarConfig)
+const selectedAvatarIndex = computed(() => store.selectedAvatarIndex)
+
 const { t } = useI18n()
 
 const colorAvatarRef = ref<VueColorAvatarRef>()
+const colorAvatarMultiRef = ref<VueColorAvatarMultiRef>()
 
 function handleGenerate() {
-  if (Math.random() <= TRIGGER_PROBABILITY) {
-    let colorfulOption = getSpecialAvatarOption()
-    while (
-      JSON.stringify(colorfulOption) === JSON.stringify(avatarOption.value)
-    ) {
-      colorfulOption = getSpecialAvatarOption()
+  if (multiAvatarMode.value === MultiAvatarMode.Single) {
+    if (Math.random() <= TRIGGER_PROBABILITY) {
+      let colorfulOption = getSpecialAvatarOption()
+      while (
+        JSON.stringify(colorfulOption) === JSON.stringify(avatarOption.value)
+      ) {
+        colorfulOption = getSpecialAvatarOption()
+      }
+      colorfulOption.wrapperShape = avatarOption.value.wrapperShape
+      setAvatarOption(colorfulOption)
+      showConfetti()
+    } else {
+      const randomOption = getRandomAvatarOption(avatarOption.value)
+      setAvatarOption(randomOption)
     }
-    colorfulOption.wrapperShape = avatarOption.value.wrapperShape
-    setAvatarOption(colorfulOption)
-    showConfetti()
   } else {
-    const randomOption = getRandomAvatarOption(avatarOption.value)
-    setAvatarOption(randomOption)
+    const currentIndex = selectedAvatarIndex.value
+    if (
+      currentIndex >= 0 &&
+      currentIndex < multiAvatarConfig.value.avatars.length
+    ) {
+      const newOption = getRandomAvatarOption()
+      store['UPDATE_AVATAR_OPTION']({ index: currentIndex, option: newOption })
+    }
   }
 
   recordEvent('click_randomize', {
@@ -156,7 +190,13 @@ const imageDataURL = ref('')
 async function handleDownload() {
   try {
     downloading.value = true
-    const avatarEle = colorAvatarRef.value?.avatarRef
+    let avatarEle: HTMLElement | undefined
+
+    if (multiAvatarMode.value === MultiAvatarMode.Single) {
+      avatarEle = colorAvatarRef.value?.avatarRef
+    } else {
+      avatarEle = colorAvatarMultiRef.value?.avatarMultiRef
+    }
 
     const userAgent = window.navigator.userAgent.toLowerCase()
     const notCompatible = NOT_COMPATIBLE_AGENTS.some(
@@ -230,6 +270,10 @@ function handleAction(actionType: ActionType) {
   }
 }
 
+function handleSelectAvatar(index: number) {
+  store[SET_SELECTED_AVATAR_INDEX](index)
+}
+
 const avatarListVisible = ref(false)
 const avatarList = ref<AvatarOption[]>([])
 
@@ -241,13 +285,18 @@ watchEffect(() => {
 async function generateMultiple(count = 5 * 6) {
   const { default: hash } = await import('object-hash')
 
+  const baseOption =
+    multiAvatarMode.value === MultiAvatarMode.Single
+      ? avatarOption.value
+      : multiAvatarConfig.value.avatars[selectedAvatarIndex.value]?.option
+
   const avatarMap = [...Array(count)].reduce<Map<string, AvatarOption>>(
     (res) => {
       let randomAvatarOption: AvatarOption
       let hashKey: string
 
       do {
-        randomAvatarOption = getRandomAvatarOption(avatarOption.value)
+        randomAvatarOption = getRandomAvatarOption(baseOption)
         hashKey = hash.sha1(randomAvatarOption)
       } while (
         randomAvatarOption.background.color === 'transparent' ||
