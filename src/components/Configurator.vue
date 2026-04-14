@@ -1,6 +1,22 @@
 <template>
   <PerfectScrollbar class="configurator-scroll">
     <div class="configurator">
+      <SectionWrapper :title="t('label.multiAvatarMode')">
+        <div class="mode-switch">
+          <button type="button" class="mode-btn" :class="{ active: true }">
+            {{ t('mode.single') }}
+          </button>
+          <button
+            type="button"
+            class="mode-btn"
+            :class="{ active: false }"
+            @click="switchToMultipleMode"
+          >
+            {{ t('mode.multiple') }}
+          </button>
+        </div>
+      </SectionWrapper>
+
       <SectionWrapper :title="t('label.wrapperShape')">
         <ul class="wrapper-shape">
           <li
@@ -126,15 +142,23 @@ import {
   type WidgetShape,
   type WrapperShape,
   BeardShape,
+  MultiAvatarMode,
   WidgetType,
 } from '@/enums'
 import { useAvatarOption } from '@/hooks'
+import { useStore } from '@/store'
+import { SET_MULTI_AVATAR_MODE } from '@/store/mutation-type'
 import { AVATAR_LAYER, SETTINGS } from '@/utils/constant'
 import { previewData } from '@/utils/dynamic-data'
 
 const { t } = useI18n()
+const store = useStore()
 
 const [avatarOption, setAvatarOption] = useAvatarOption()
+
+function switchToMultipleMode() {
+  store[SET_MULTI_AVATAR_MODE](MultiAvatarMode.Multiple)
+}
 
 const sectionList = reactive(Object.values(WidgetType))
 const sections = ref<
@@ -272,6 +296,32 @@ function getWidgetColor(type: string) {
 .configurator {
   width: 100%;
   color: var.$color-text;
+
+  .mode-switch {
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  .mode-btn {
+    flex: 1;
+    padding: 0.6rem 1rem;
+    border: none;
+    border-radius: 0.5rem;
+    background-color: var.$color-gray;
+    color: var.$color-text;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-weight: 500;
+
+    &.active {
+      background-color: var.$color-accent;
+      color: white;
+    }
+
+    &:hover:not(.active) {
+      background-color: lighten(var.$color-gray, 5);
+    }
+  }
 
   .wrapper-shape {
     display: flex;
