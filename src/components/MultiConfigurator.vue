@@ -6,233 +6,226 @@
           <button
             type="button"
             class="mode-btn"
-            :class="{ active: multiAvatarMode === MultiAvatarMode.Single }"
-            @click="switchMode(MultiAvatarMode.Single)"
+            :class="{ active: false }"
+            @click="switchToSingleMode"
           >
             {{ t('mode.single') }}
           </button>
-          <button
-            type="button"
-            class="mode-btn"
-            :class="{ active: multiAvatarMode === MultiAvatarMode.Multiple }"
-            @click="switchMode(MultiAvatarMode.Multiple)"
-          >
+          <button type="button" class="mode-btn" :class="{ active: true }">
             {{ t('mode.multiple') }}
           </button>
         </div>
       </SectionWrapper>
 
-      <template v-if="multiAvatarMode === MultiAvatarMode.Multiple">
-        <SectionWrapper :title="t('label.preset')">
-          <div class="preset-list">
-            <button
-              v-for="preset in availablePresets"
-              :key="preset"
-              type="button"
-              class="preset-btn"
-              :class="{ active: multiAvatarConfig.preset === preset }"
-              @click="applyPreset(preset)"
-            >
-              {{ t(`preset.${preset}`) }}
-            </button>
-          </div>
-        </SectionWrapper>
-
-        <SectionWrapper :title="t('label.avatarList')">
-          <div class="avatar-list">
-            <div
-              v-for="(avatar, index) in multiAvatarConfig.avatars"
-              :key="avatar.id"
-              class="avatar-list-item"
-              :class="{
-                'avatar-list-item--selected': index === selectedAvatarIndex,
-              }"
-              @click="selectAvatar(index)"
-            >
-              <div class="avatar-preview">
-                <VueColorAvatar :option="avatar.option" :size="60" />
-              </div>
-              <div class="avatar-info">
-                <span class="avatar-label"
-                  >{{ t('label.avatar') }} {{ index + 1 }}</span
-                >
-                <div class="avatar-actions">
-                  <button
-                    type="button"
-                    class="action-icon"
-                    :title="t('action.randomize')"
-                    @click.stop="randomizeAvatar(index)"
-                  >
-                    🎲
-                  </button>
-                  <button
-                    v-if="multiAvatarConfig.avatars.length > 1"
-                    type="button"
-                    class="action-icon"
-                    :title="t('action.remove')"
-                    @click.stop="removeAvatar(index)"
-                  >
-                    🗑️
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-          <button type="button" class="add-avatar-btn" @click="addAvatar">
-            + {{ t('action.addAvatar') }}
+      <SectionWrapper :title="t('label.preset')">
+        <div class="preset-list">
+          <button
+            v-for="preset in availablePresets"
+            :key="preset"
+            type="button"
+            class="preset-btn"
+            :class="{ active: multiAvatarConfig.preset === preset }"
+            @click="applyPreset(preset)"
+          >
+            {{ t(`preset.${preset}`) }}
           </button>
-        </SectionWrapper>
+        </div>
+      </SectionWrapper>
 
-        <SectionWrapper
-          v-if="selectedAvatar !== null"
-          :title="t('label.positionAdjust')"
-        >
-          <div class="position-controls">
-            <div class="control-group">
-              <label>{{ t('label.positionX') }}</label>
-              <input
-                type="range"
-                min="-200"
-                max="200"
-                step="5"
-                :value="selectedAvatar.position.x"
-                @input="
-                  updatePosition(
-                    'x',
-                    Number(($event.target as HTMLInputElement).value)
-                  )
-                "
-              />
-              <span class="value-display"
-                >{{ selectedAvatar.position.x }}px</span
-              >
+      <SectionWrapper :title="t('label.avatarList')">
+        <div class="avatar-list">
+          <div
+            v-for="(avatar, index) in multiAvatarConfig.avatars"
+            :key="avatar.id"
+            class="avatar-list-item"
+            :class="{
+              'avatar-list-item--selected': index === selectedAvatarIndex,
+            }"
+            @click="selectAvatar(index)"
+          >
+            <div class="avatar-preview">
+              <VueColorAvatar :option="avatar.option" :size="60" />
             </div>
-
-            <div class="control-group">
-              <label>{{ t('label.positionY') }}</label>
-              <input
-                type="range"
-                min="-200"
-                max="200"
-                step="5"
-                :value="selectedAvatar.position.y"
-                @input="
-                  updatePosition(
-                    'y',
-                    Number(($event.target as HTMLInputElement).value)
-                  )
-                "
-              />
-              <span class="value-display"
-                >{{ selectedAvatar.position.y }}px</span
-              >
-            </div>
-
-            <div class="control-group">
-              <label>{{ t('label.scale') }}</label>
-              <input
-                type="range"
-                min="0.3"
-                max="1.5"
-                step="0.05"
-                :value="selectedAvatar.position.scale"
-                @input="
-                  updatePosition(
-                    'scale',
-                    Number(($event.target as HTMLInputElement).value)
-                  )
-                "
-              />
-              <span class="value-display"
-                >{{ Math.round(selectedAvatar.position.scale * 100) }}%</span
-              >
-            </div>
-
-            <div class="control-group">
-              <label>{{ t('label.rotation') }}</label>
-              <input
-                type="range"
-                min="-180"
-                max="180"
-                step="5"
-                :value="selectedAvatar.position.rotation"
-                @input="
-                  updatePosition(
-                    'rotation',
-                    Number(($event.target as HTMLInputElement).value)
-                  )
-                "
-              />
-              <span class="value-display"
-                >{{ selectedAvatar.position.rotation }}°</span
-              >
+            <div class="avatar-info">
+              <span class="avatar-label">
+                {{ t('label.avatar') }} {{ index + 1 }}
+              </span>
+              <div class="avatar-actions">
+                <button
+                  type="button"
+                  class="action-icon"
+                  :title="t('action.randomize')"
+                  @click.stop="randomizeAvatar(index)"
+                >
+                  🎲
+                </button>
+                <button
+                  v-if="multiAvatarConfig.avatars.length > 1"
+                  type="button"
+                  class="action-icon"
+                  :title="t('action.remove')"
+                  @click.stop="removeAvatar(index)"
+                >
+                  🗑️
+                </button>
+              </div>
             </div>
           </div>
-        </SectionWrapper>
+        </div>
+        <button type="button" class="add-avatar-btn" @click="addAvatar">
+          + {{ t('action.addAvatar') }}
+        </button>
+      </SectionWrapper>
 
-        <SectionWrapper :title="t('label.wrapperShape')">
-          <ul class="wrapper-shape">
-            <li
-              v-for="wrapperShape in SETTINGS.wrapperShape"
-              :key="wrapperShape"
-              class="wrapper-shape__item"
-              :title="t(`wrapperShape.${wrapperShape}`)"
-              @click="switchWrapperShape(wrapperShape)"
-            >
-              <div
-                class="shape"
-                :class="[
-                  wrapperShape,
-                  { active: wrapperShape === multiAvatarConfig.wrapperShape },
-                ]"
-              />
-            </li>
-          </ul>
-        </SectionWrapper>
+      <SectionWrapper
+        v-if="selectedAvatar !== null"
+        :title="t('label.positionAdjust')"
+      >
+        <div class="position-controls">
+          <div class="control-group">
+            <label>{{ t('label.positionX') }}</label>
+            <input
+              type="range"
+              min="-200"
+              max="200"
+              step="5"
+              :value="selectedAvatar.position.x"
+              @input="
+                updatePosition(
+                  'x',
+                  Number(($event.target as HTMLInputElement).value)
+                )
+              "
+            />
+            <span class="value-display">
+              {{ selectedAvatar.position.x }}px
+            </span>
+          </div>
 
-        <SectionWrapper :title="t('label.borderColor')">
-          <ul class="color-list">
-            <li
-              v-for="borderColor in SETTINGS.borderColor"
-              :key="borderColor"
-              class="color-list__item"
-              @click="switchBorderColor(borderColor)"
-            >
-              <div
-                :style="{ background: borderColor }"
-                class="bg-color"
-                :class="[
-                  {
-                    active:
-                      borderColor === multiAvatarConfig.background.borderColor,
-                    transparent: borderColor === 'transparent',
-                  },
-                ]"
-              />
-            </li>
-          </ul>
-        </SectionWrapper>
+          <div class="control-group">
+            <label>{{ t('label.positionY') }}</label>
+            <input
+              type="range"
+              min="-200"
+              max="200"
+              step="5"
+              :value="selectedAvatar.position.y"
+              @input="
+                updatePosition(
+                  'y',
+                  Number(($event.target as HTMLInputElement).value)
+                )
+              "
+            />
+            <span class="value-display">
+              {{ selectedAvatar.position.y }}px
+            </span>
+          </div>
 
-        <SectionWrapper :title="t('label.backgroundColor')">
-          <ul class="color-list">
-            <li
-              v-for="bgColor in SETTINGS.backgroundColor"
-              :key="bgColor"
-              class="color-list__item"
-              @click="switchBgColor(bgColor)"
-            >
-              <div
-                :style="{ background: bgColor }"
-                class="bg-color"
-                :class="{
-                  active: bgColor === multiAvatarConfig.background.color,
-                  transparent: bgColor === 'transparent',
-                }"
-              ></div>
-            </li>
-          </ul>
-        </SectionWrapper>
-      </template>
+          <div class="control-group">
+            <label>{{ t('label.scale') }}</label>
+            <input
+              type="range"
+              min="0.3"
+              max="1.5"
+              step="0.05"
+              :value="selectedAvatar.position.scale"
+              @input="
+                updatePosition(
+                  'scale',
+                  Number(($event.target as HTMLInputElement).value)
+                )
+              "
+            />
+            <span class="value-display">
+              {{ Math.round(selectedAvatar.position.scale * 100) }}%
+            </span>
+          </div>
+
+          <div class="control-group">
+            <label>{{ t('label.rotation') }}</label>
+            <input
+              type="range"
+              min="-180"
+              max="180"
+              step="5"
+              :value="selectedAvatar.position.rotation"
+              @input="
+                updatePosition(
+                  'rotation',
+                  Number(($event.target as HTMLInputElement).value)
+                )
+              "
+            />
+            <span class="value-display">
+              {{ selectedAvatar.position.rotation }}°
+            </span>
+          </div>
+        </div>
+      </SectionWrapper>
+
+      <SectionWrapper :title="t('label.wrapperShape')">
+        <ul class="wrapper-shape">
+          <li
+            v-for="wrapperShape in SETTINGS.wrapperShape"
+            :key="wrapperShape"
+            class="wrapper-shape__item"
+            :title="t(`wrapperShape.${wrapperShape}`)"
+            @click="switchWrapperShape(wrapperShape)"
+          >
+            <div
+              class="shape"
+              :class="[
+                wrapperShape,
+                { active: wrapperShape === multiAvatarConfig.wrapperShape },
+              ]"
+            />
+          </li>
+        </ul>
+      </SectionWrapper>
+
+      <SectionWrapper :title="t('label.borderColor')">
+        <ul class="color-list">
+          <li
+            v-for="borderColor in SETTINGS.borderColor"
+            :key="borderColor"
+            class="color-list__item"
+            @click="switchBorderColor(borderColor)"
+          >
+            <div
+              :style="{ background: borderColor }"
+              class="bg-color"
+              :class="[
+                {
+                  active:
+                    borderColor === multiAvatarConfig.background.borderColor,
+                  transparent: borderColor === 'transparent',
+                },
+              ]"
+            />
+          </li>
+        </ul>
+      </SectionWrapper>
+
+      <SectionWrapper :title="t('label.backgroundColor')">
+        <ul class="color-list">
+          <li
+            v-for="bgColor in SETTINGS.backgroundColor"
+            :key="bgColor"
+            class="color-list__item"
+            @click="switchBgColor(bgColor)"
+          >
+            <div
+              :style="{ background: bgColor }"
+              class="bg-color"
+              :class="{
+                active: bgColor === multiAvatarConfig.background.color,
+                transparent: bgColor === 'transparent',
+              }"
+            ></div>
+          </li>
+        </ul>
+      </SectionWrapper>
     </div>
   </PerfectScrollbar>
 </template>
@@ -244,8 +237,7 @@ import { useI18n } from 'vue-i18n'
 import PerfectScrollbar from '@/components/PerfectScrollbar.vue'
 import SectionWrapper from '@/components/SectionWrapper.vue'
 import VueColorAvatar from '@/components/VueColorAvatar.vue'
-import type { MultiAvatarMode } from '@/enums'
-import { WrapperShape } from '@/enums'
+import { MultiAvatarMode, WrapperShape } from '@/enums'
 import { useStore } from '@/store'
 import {
   ADD_AVATAR,
@@ -263,7 +255,6 @@ import { MULTI_AVATAR_PRESETS, SETTINGS } from '@/utils/constant'
 const { t } = useI18n()
 const store = useStore()
 
-const multiAvatarMode = computed(() => store.multiAvatarMode)
 const multiAvatarConfig = computed(() => store.multiAvatarConfig)
 const selectedAvatarIndex = computed(() => store.selectedAvatarIndex)
 
@@ -285,8 +276,8 @@ const availablePresets = computed<MultiAvatarPreset[]>(() => {
   ]
 })
 
-function switchMode(mode: MultiAvatarMode) {
-  store[SET_MULTI_AVATAR_MODE](mode)
+function switchToSingleMode() {
+  store[SET_MULTI_AVATAR_MODE](MultiAvatarMode.Single)
 }
 
 function applyPreset(preset: MultiAvatarPreset) {
