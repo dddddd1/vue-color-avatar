@@ -15,18 +15,17 @@
       <div
         v-for="(avatar, index) in multiAvatarConfig.avatars"
         :key="avatar.id"
-        class="avatar-item"
+        class="avatar-item-wrapper"
         :class="{
-          'avatar-item--selected': index === selectedAvatarIndex,
-          'avatar-item--hidden': !avatar.visible,
+          'avatar-item-wrapper--selected': index === selectedAvatarIndex,
         }"
-        :style="getAvatarItemStyle(avatar.position)"
+        :style="getAvatarWrapperStyle(avatar.position)"
         @click="handleAvatarClick(index)"
       >
         <VueColorAvatar
           :ref="(el) => setAvatarRef(el, index)"
           :option="avatar.option"
-          :size="getAvatarSize(avatar.position.scale)"
+          :size="280"
         />
       </div>
     </div>
@@ -38,15 +37,6 @@
   </div>
 </template>
 
-<script lang="ts">
-import type VueColorAvatar from './VueColorAvatar.vue'
-
-export interface VueColorAvatarMultiRef {
-  avatarMultiRef: HTMLDivElement
-  avatarRefs: (InstanceType<typeof VueColorAvatar> | undefined)[]
-}
-</script>
-
 <script lang="ts" setup>
 import { ref, toRefs } from 'vue'
 
@@ -54,8 +44,14 @@ import { WrapperShape } from '@/enums'
 import type { AvatarPosition, MultiAvatarConfig } from '@/types'
 import { SHAPE_STYLE_SET } from '@/utils/constant'
 
+import type VueColorAvatar from './VueColorAvatar.vue'
 import Background from './widgets/Background.vue'
 import Border from './widgets/Border.vue'
+
+export interface VueColorAvatarMultiRef {
+  avatarMultiRef: HTMLDivElement
+  avatarRefs: (InstanceType<typeof VueColorAvatar> | undefined)[]
+}
 
 interface VueColorAvatarMultiProps {
   config: MultiAvatarConfig
@@ -102,13 +98,27 @@ function getWrapperShapeStyle() {
   ]
 }
 
-function getAvatarSize(scale: number): number {
-  return Math.floor(280 * scale)
-}
+function getAvatarWrapperStyle(position: AvatarPosition) {
+  const baseSize = 280
+  const containerSize = avatarSize.value
+  const scale = position.scale
 
-function getAvatarItemStyle(position: AvatarPosition) {
+  const centerX = containerSize / 2
+  const centerY = containerSize / 2
+
+  const offsetX = position.x
+  const offsetY = position.y
+
+  const left = centerX - (baseSize * scale) / 2 + offsetX
+  const top = centerY - (baseSize * scale) / 2 + offsetY
+
   return {
-    transform: `translate(${position.x}px, ${position.y}px) scale(${position.scale}) rotate(${position.rotation}deg)`,
+    position: 'absolute' as const,
+    left: `${left}px`,
+    top: `${top}px`,
+    width: `${baseSize * scale}px`,
+    height: `${baseSize * scale}px`,
+    transform: `rotate(${position.rotation}deg)`,
     transformOrigin: 'center center',
   }
 }
@@ -133,16 +143,12 @@ function handleAvatarClick(index: number) {
     left: 0;
     width: 100%;
     height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
     z-index: 2;
   }
 
-  .avatar-item {
-    position: absolute;
+  .avatar-item-wrapper {
     cursor: pointer;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    transition: box-shadow 0.2s ease;
     border-radius: 50%;
 
     &:hover {
@@ -155,8 +161,9 @@ function handleAvatarClick(index: number) {
         0 0 20px rgba(105, 103, 254, 0.3);
     }
 
-    &--hidden {
-      opacity: 0.3;
+    :deep(.vue-color-avatar) {
+      width: 100% !important;
+      height: 100% !important;
     }
   }
 }
