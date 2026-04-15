@@ -23,9 +23,9 @@
         @click="handleAvatarClick(index)"
       >
         <VueColorAvatar
-          :ref="(el) => setAvatarRef(el, index)"
           :option="avatar.option"
           :size="280"
+          :show-background="false"
         />
       </div>
     </div>
@@ -44,13 +44,12 @@ import { WrapperShape } from '@/enums'
 import type { AvatarPosition, MultiAvatarConfig } from '@/types'
 import { SHAPE_STYLE_SET } from '@/utils/constant'
 
-import type VueColorAvatar from './VueColorAvatar.vue'
 import Background from './widgets/Background.vue'
 import Border from './widgets/Border.vue'
+import VueColorAvatar from './VueColorAvatar.vue'
 
 export interface VueColorAvatarMultiRef {
   avatarMultiRef: HTMLDivElement
-  avatarRefs: (InstanceType<typeof VueColorAvatar> | undefined)[]
 }
 
 interface VueColorAvatarMultiProps {
@@ -71,15 +70,8 @@ const {
 } = toRefs(props)
 
 const avatarMultiRef = ref<VueColorAvatarMultiRef['avatarMultiRef']>()
-const avatarRefs = ref<(InstanceType<typeof VueColorAvatar> | undefined)[]>([])
 
-function setAvatarRef(el: unknown, index: number) {
-  if (el) {
-    avatarRefs.value[index] = el as InstanceType<typeof VueColorAvatar>
-  }
-}
-
-defineExpose({ avatarMultiRef, avatarRefs })
+defineExpose({ avatarMultiRef })
 
 function getWrapperShapeClassName() {
   return {
@@ -109,16 +101,16 @@ function getAvatarWrapperStyle(position: AvatarPosition) {
   const offsetX = position.x
   const offsetY = position.y
 
-  const left = centerX - (baseSize * scale) / 2 + offsetX
-  const top = centerY - (baseSize * scale) / 2 + offsetY
+  const translateX = offsetX
+  const translateY = offsetY
 
   return {
     position: 'absolute' as const,
-    left: `${left}px`,
-    top: `${top}px`,
-    width: `${baseSize * scale}px`,
-    height: `${baseSize * scale}px`,
-    transform: `rotate(${position.rotation}deg)`,
+    left: `${centerX - baseSize / 2}px`,
+    top: `${centerY - baseSize / 2}px`,
+    width: `${baseSize}px`,
+    height: `${baseSize}px`,
+    transform: `translate(${translateX}px, ${translateY}px) scale(${scale}) rotate(${position.rotation}deg)`,
     transformOrigin: 'center center',
   }
 }
@@ -148,7 +140,7 @@ function handleAvatarClick(index: number) {
 
   .avatar-item-wrapper {
     cursor: pointer;
-    transition: box-shadow 0.2s ease;
+    transition: box-shadow 0.2s ease, z-index 0.2s ease;
     border-radius: 50%;
 
     &:hover {
@@ -164,6 +156,20 @@ function handleAvatarClick(index: number) {
     :deep(.vue-color-avatar) {
       width: 100% !important;
       height: 100% !important;
+      background: transparent !important;
+      border-radius: 50% !important;
+    }
+
+    :deep(.vue-color-avatar.circle) {
+      border-radius: 50% !important;
+    }
+
+    :deep(.vue-color-avatar.square) {
+      border-radius: 0 !important;
+    }
+
+    :deep(.vue-color-avatar.squircle) {
+      border-radius: 20% !important;
     }
   }
 }

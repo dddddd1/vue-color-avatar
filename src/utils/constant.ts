@@ -238,27 +238,27 @@ export const MULTI_AVATAR_PRESETS: Readonly<{
   [MultiAvatarPreset.Couple]: {
     count: 2,
     positions: [
-      { x: -60, y: 0, scale: 0.85, rotation: 0 },
-      { x: 60, y: 0, scale: 0.85, rotation: 0 },
+      { x: -90, y: 0, scale: 0.65, rotation: 0 },
+      { x: 90, y: 0, scale: 0.65, rotation: 0 },
     ],
     name: 'couple',
   },
   [MultiAvatarPreset.FamilyOf3]: {
     count: 3,
     positions: [
-      { x: -80, y: 20, scale: 0.75, rotation: 0 },
-      { x: 0, y: -30, scale: 0.85, rotation: 0 },
-      { x: 80, y: 20, scale: 0.75, rotation: 0 },
+      { x: -80, y: 40, scale: 0.55, rotation: 0 },
+      { x: 0, y: -50, scale: 0.6, rotation: 0 },
+      { x: 80, y: 40, scale: 0.55, rotation: 0 },
     ],
     name: 'familyOf3',
   },
   [MultiAvatarPreset.FamilyOf4]: {
     count: 4,
     positions: [
-      { x: -70, y: -40, scale: 0.7, rotation: 0 },
-      { x: 70, y: -40, scale: 0.7, rotation: 0 },
-      { x: -70, y: 50, scale: 0.7, rotation: 0 },
-      { x: 70, y: 50, scale: 0.7, rotation: 0 },
+      { x: -70, y: -60, scale: 0.5, rotation: 0 },
+      { x: 70, y: -60, scale: 0.5, rotation: 0 },
+      { x: -70, y: 60, scale: 0.5, rotation: 0 },
+      { x: 70, y: 60, scale: 0.5, rotation: 0 },
     ],
     name: 'familyOf4',
   },

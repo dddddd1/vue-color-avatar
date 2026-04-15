@@ -9,11 +9,12 @@
     }"
     :class="getWrapperShapeClassName()"
   >
-    <Background :color="avatarOption.background.color" />
+    <Background v-if="showBackground" :color="avatarOption.background.color" />
 
     <div class="avatar-payload" v-html="svgContent" />
 
     <Border
+      v-if="showBackground"
       :color="avatarOption.background.borderColor"
       :radius="getWrapperShapeStyle().borderRadius"
     />
@@ -41,14 +42,16 @@ import Border from './widgets/Border.vue'
 interface VueColorAvatarProps {
   option: AvatarOption
   size?: number
+  showBackground?: boolean
 }
 
 const props = withDefaults(defineProps<VueColorAvatarProps>(), {
   option: () => getRandomAvatarOption(),
   size: 280,
+  showBackground: true,
 })
 
-const { option: avatarOption, size: avatarSize } = toRefs(props)
+const { option: avatarOption, size: avatarSize, showBackground } = toRefs(props)
 
 const avatarRef = ref<VueColorAvatarRef['avatarRef']>()
 
