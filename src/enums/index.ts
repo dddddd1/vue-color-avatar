@@ -8,6 +8,8 @@ export const enum ActionType {
   Redo = 'redo',
   Flip = 'flip',
   Code = 'code',
+  History = 'history',
+  Save = 'save',
 }
 
 export const enum Gender {

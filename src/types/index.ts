@@ -73,3 +73,25 @@ export interface AvatarSettings {
   backgroundColor: string[]
   borderColor: string[]
 }
+
+export interface AvatarHistoryItem {
+  id: string
+  name: string
+  option: AvatarOption
+  preview: string
+  createdAt: number
+}
+
+export interface AvatarHistorySearchParams {
+  keyword?: string
+  page?: number
+  pageSize?: number
+}
+
+export interface AvatarHistoryPaginationResult {
+  items: AvatarHistoryItem[]
+  total: number
+  page: number
+  pageSize: number
+  totalPages: number
+}

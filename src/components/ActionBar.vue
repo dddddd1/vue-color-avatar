@@ -8,7 +8,8 @@
       :title="ac.tip"
       @click="emit('action', ac.type)"
     >
-      <img :src="ac.icon" :alt="ac.tip" />
+      <img v-if="ac.icon" :src="ac.icon" :alt="ac.tip" />
+      <span v-else class="menu-icon-text">{{ ac.text }}</span>
     </div>
   </div>
 </template>
@@ -23,6 +24,7 @@ import IconFlip from '@/assets/icons/icon-flip.svg'
 import IconNext from '@/assets/icons/icon-next.svg'
 import { ActionType } from '@/enums'
 import { useStore } from '@/store'
+import { useHistoryStore } from '@/store/history-store'
 
 const emit = defineEmits<{
   (e: 'action', actionType: ActionType): void
@@ -31,6 +33,7 @@ const emit = defineEmits<{
 const { t } = useI18n()
 
 const store = useStore()
+const historyStore = useHistoryStore()
 
 const canUndo = computed(() => store.history.past.length > 0)
 const canRedo = computed(() => store.history.future.length > 0)
@@ -41,22 +44,42 @@ const actions = computed(() => [
     icon: IconBack,
     tip: t('action.undo'),
     disabled: !canUndo.value,
+    text: '',
   },
   {
     type: ActionType.Redo,
     icon: IconNext,
     tip: t('action.redo'),
     disabled: !canRedo.value,
+    text: '',
   },
   {
     type: ActionType.Flip,
     icon: IconFlip,
     tip: t('action.flip'),
+    disabled: false,
+    text: '',
+  },
+  {
+    type: ActionType.Save,
+    icon: null,
+    tip: t('action.save'),
+    disabled: false,
+    text: '💾',
+  },
+  {
+    type: ActionType.History,
+    icon: null,
+    tip: t('action.history'),
+    disabled: false,
+    text: '📜',
   },
   {
     type: ActionType.Code,
     icon: IconCode,
     tip: t('action.code'),
+    disabled: false,
+    text: '',
   },
 ])
 </script>
@@ -82,11 +105,19 @@ const actions = computed(() => [
     background-color: lighten(var.$color-gray, 10);
     border-radius: 50%;
     cursor: pointer;
-    transition: opacity 0.2s;
+    transition: opacity 0.2s, transform 0.2s;
+
+    &:hover:not(.disabled) {
+      transform: scale(1.1);
+    }
 
     &.disabled {
       cursor: default;
       opacity: 0.6;
+    }
+
+    .menu-icon-text {
+      font-size: 1.1rem;
     }
   }
 }

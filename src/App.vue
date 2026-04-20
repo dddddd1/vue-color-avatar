@@ -69,9 +69,18 @@
             @close=";(downloadModalVisible = false), (imageDataURL = '')"
           />
 
+          <SaveModal
+            :visible="saveModalVisible"
+            :preview-url="imageDataURL"
+            @close="saveModalVisible = false"
+            @save="handleSaveAvatar"
+          />
+
           <HistoryModal
             :visible="historyModalVisible"
             @close="historyModalVisible = false"
+            @restore="handleRestoreAvatar"
+          />
           />
         </div>
 
@@ -98,7 +107,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, watchEffect } from 'vue'
+import { ref, watchEffect, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import ActionBar from '@/components/ActionBar.vue'
@@ -107,6 +116,7 @@ import BatchDownloadModal from '@/components/Modal/BatchDownloadModal.vue'
 import CodeModal from '@/components/Modal/CodeModal.vue'
 import DownloadModal from '@/components/Modal/DownloadModal.vue'
 import HistoryModal from '@/components/Modal/HistoryModal.vue'
+import SaveModal from '@/components/Modal/SaveModal.vue'
 import VueColorAvatar, {
   type VueColorAvatarRef,
 } from '@/components/VueColorAvatar.vue'
@@ -117,6 +127,7 @@ import Footer from '@/layouts/Footer.vue'
 import Header from '@/layouts/Header.vue'
 import Sider from '@/layouts/Sider.vue'
 import { useStore } from '@/store'
+import { useHistoryStore } from '@/store/history-store'
 import { REDO, UNDO } from '@/store/mutation-type'
 import {
   getRandomAvatarOption,
@@ -135,12 +146,17 @@ import ConfettiCanvas from './components/ConfettiCanvas.vue'
 import type { AvatarOption } from './types'
 
 const store = useStore()
+const historyStore = useHistoryStore()
 
 const [avatarOption, setAvatarOption] = useAvatarOption()
 
 const { t } = useI18n()
 
 const colorAvatarRef = ref<VueColorAvatarRef>()
+
+onMounted(() => {
+  historyStore.loadFromStorage()
+})
 
 function handleGenerate() {
   if (Math.random() <= TRIGGER_PROBABILITY) {
@@ -207,9 +223,26 @@ async function handleDownload() {
 
 const flipped = ref(false)
 const codeVisible = ref(false)
+const saveModalVisible = ref(false)
 const historyModalVisible = ref(false)
 
-function handleAction(actionType: ActionType) {
+async function captureAvatarPreview(): Promise<string> {
+  try {
+    const avatarEle = colorAvatarRef.value?.avatarRef
+    if (!avatarEle) return ''
+
+    const html2canvas = (await import('html2canvas')).default
+    const canvas = await html2canvas(avatarEle, {
+      backgroundColor: null,
+    })
+    return canvas.toDataURL()
+  } catch (error) {
+    console.error('Failed to capture avatar preview:', error)
+    return ''
+  }
+}
+
+async function handleAction(actionType: ActionType) {
   switch (actionType) {
     case ActionType.Undo:
       store[UNDO]()
@@ -235,6 +268,23 @@ function handleAction(actionType: ActionType) {
       })
       break
 
+    case ActionType.Save:
+      imageDataURL.value = await captureAvatarPreview()
+      saveModalVisible.value = true
+      recordEvent('action_save_avatar', {
+        event_category: 'action',
+        event_label: 'Save Avatar',
+      })
+      break
+
+    case ActionType.History:
+      historyModalVisible.value = true
+      recordEvent('action_view_history', {
+        event_category: 'action',
+        event_label: 'View History',
+      })
+      break
+
     case ActionType.Code:
       codeVisible.value = !codeVisible.value
       recordEvent('action_view_code', {
@@ -243,6 +293,38 @@ function handleAction(actionType: ActionType) {
       })
       break
   }
+}
+
+async function handleSaveAvatar(name: string) {
+  try {
+    if (!imageDataURL.value) {
+      imageDataURL.value = await captureAvatarPreview()
+    }
+
+    historyStore.addHistoryItem({
+      name,
+      option: JSON.parse(JSON.stringify(avatarOption.value)),
+      preview: imageDataURL.value,
+    })
+
+    saveModalVisible.value = false
+    imageDataURL.value = ''
+
+    recordEvent('action_save_avatar_success', {
+      event_category: 'action',
+      event_label: 'Save Avatar Success',
+    })
+  } catch (error) {
+    console.error('Failed to save avatar:', error)
+  }
+}
+
+function handleRestoreAvatar(option: AvatarOption) {
+  setAvatarOption(option)
+  recordEvent('action_restore_avatar', {
+    event_category: 'action',
+    event_label: 'Restore Avatar',
+  })
 }
 
 const avatarListVisible = ref(false)
