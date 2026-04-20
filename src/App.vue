@@ -34,11 +34,19 @@
                 :disabled="downloading"
                 @click="handleDownload"
               >
-                {{
+                {{ 
                   downloading
                     ? `${t('action.downloading')}...`
                     : t('action.download')
                 }}
+              </button>
+
+              <button
+                type="button"
+                class="action-btn action-history"
+                @click="historyModalVisible = true"
+              >
+                {{ t('action.history') }}
               </button>
 
               <button
@@ -59,6 +67,11 @@
             :visible="downloadModalVisible"
             :image-url="imageDataURL"
             @close=";(downloadModalVisible = false), (imageDataURL = '')"
+          />
+
+          <HistoryModal
+            :visible="historyModalVisible"
+            @close="historyModalVisible = false"
           />
         </div>
 
@@ -93,6 +106,7 @@ import Configurator from '@/components/Configurator.vue'
 import BatchDownloadModal from '@/components/Modal/BatchDownloadModal.vue'
 import CodeModal from '@/components/Modal/CodeModal.vue'
 import DownloadModal from '@/components/Modal/DownloadModal.vue'
+import HistoryModal from '@/components/Modal/HistoryModal.vue'
 import VueColorAvatar, {
   type VueColorAvatarRef,
 } from '@/components/VueColorAvatar.vue'
@@ -193,6 +207,7 @@ async function handleDownload() {
 
 const flipped = ref(false)
 const codeVisible = ref(false)
+const historyModalVisible = ref(false)
 
 function handleAction(actionType: ActionType) {
   switch (actionType) {
