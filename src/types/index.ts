@@ -73,3 +73,17 @@ export interface AvatarSettings {
   backgroundColor: string[]
   borderColor: string[]
 }
+
+export interface FavoriteItem {
+  id: string
+  name?: string
+  avatarOption: AvatarOption
+  createdAt: number
+  gender?: Gender
+}
+
+export interface FavoritesState {
+  items: FavoriteItem[]
+  isPanelOpen: boolean
+  selectedIds: Set<string>
+}

@@ -30,6 +30,23 @@
 
               <button
                 type="button"
+                class="action-btn action-favorite"
+                :class="{ 'is-favorite': isCurrentFavorite }"
+                @click="handleToggleFavorite"
+              >
+                {{ isCurrentFavorite ? t('action.removeFromFavorites') : t('action.addToFavorites') }}
+              </button>
+
+              <button
+                type="button"
+                class="action-btn action-favorites"
+                @click="handleShowFavorites"
+              >
+                {{ t('action.showFavorites') }} ({{ favoritesCount }})
+              </button>
+
+              <button
+                type="button"
                 class="action-btn action-download"
                 :disabled="downloading"
                 @click="handleDownload"
@@ -81,15 +98,18 @@
     <Sider>
       <Configurator />
     </Sider>
+
+    <FavoritesPanel ref="favoritesPanelRef" />
   </main>
 </template>
 
 <script lang="ts" setup>
-import { ref, watchEffect } from 'vue'
+import { computed, ref, watchEffect } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import ActionBar from '@/components/ActionBar.vue'
 import Configurator from '@/components/Configurator.vue'
+import FavoritesPanel from '@/components/FavoritesPanel.vue'
 import BatchDownloadModal from '@/components/Modal/BatchDownloadModal.vue'
 import CodeModal from '@/components/Modal/CodeModal.vue'
 import DownloadModal from '@/components/Modal/DownloadModal.vue'
@@ -103,7 +123,13 @@ import Footer from '@/layouts/Footer.vue'
 import Header from '@/layouts/Header.vue'
 import Sider from '@/layouts/Sider.vue'
 import { useStore } from '@/store'
-import { REDO, UNDO } from '@/store/mutation-type'
+import {
+  ADD_FAVORITE,
+  REDO,
+  REMOVE_FAVORITE,
+  TOGGLE_FAVORITES_PANEL,
+  UNDO,
+} from '@/store/mutation-type'
 import {
   getRandomAvatarOption,
   getSpecialAvatarOption,
@@ -127,6 +153,36 @@ const [avatarOption, setAvatarOption] = useAvatarOption()
 const { t } = useI18n()
 
 const colorAvatarRef = ref<VueColorAvatarRef>()
+const favoritesPanelRef = ref<InstanceType<typeof FavoritesPanel>>()
+
+const favoritesCount = computed(() => store.favorites.items.length)
+
+const isCurrentFavorite = computed(() => {
+  const currentOption = avatarOption.value
+  return store.favorites.items.some((item) => {
+    return JSON.stringify(item.avatarOption) === JSON.stringify(currentOption)
+  })
+})
+
+const currentFavoriteId = computed(() => {
+  const currentOption = avatarOption.value
+  const found = store.favorites.items.find((item) => {
+    return JSON.stringify(item.avatarOption) === JSON.stringify(currentOption)
+  })
+  return found?.id
+})
+
+function handleToggleFavorite() {
+  if (isCurrentFavorite.value && currentFavoriteId.value) {
+    store[REMOVE_FAVORITE](currentFavoriteId.value)
+  } else {
+    store[ADD_FAVORITE](avatarOption.value)
+  }
+}
+
+function handleShowFavorites() {
+  store[TOGGLE_FAVORITES_PANEL]()
+}
 
 function handleGenerate() {
   if (Math.random() <= TRIGGER_PROBABILITY) {
@@ -334,11 +390,12 @@ async function generateMultiple(count = 5 * 6) {
       background: var.$color-gray;
       border-radius: 0.6rem;
       cursor: pointer;
-      transition: color 0.2s;
+      transition: all 0.2s;
       user-select: none;
 
       &:hover {
         color: lighten(var.$color-text, 10);
+        background-color: lighten(var.$color-gray, 5);
       }
 
       &:disabled,
@@ -346,11 +403,39 @@ async function generateMultiple(count = 5 * 6) {
         color: rgba(var.$color-text, 0.5);
         cursor: default;
       }
+
+      &.action-favorite {
+        min-width: 8rem;
+
+        &.is-favorite {
+          background-color: var.$color-accent;
+          color: white;
+
+          &:hover {
+            background-color: lighten(var.$color-accent, 10);
+          }
+        }
+      }
+
+      &.action-favorites {
+        min-width: 8rem;
+        background-color: darken(var.$color-gray, 3);
+
+        &:hover {
+          background-color: darken(var.$color-gray, 6);
+        }
+      }
     }
 
     @media screen and (max-width: var.$screen-sm) {
       .action-multiple {
         display: none;
+      }
+
+      .action-favorite,
+      .action-favorites {
+        min-width: auto;
+        font-size: 0.8rem;
       }
     }
   }

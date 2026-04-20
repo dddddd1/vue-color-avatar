@@ -1,4 +1,4 @@
-import { WidgetType } from '@/enums'
+import { Gender, WidgetType } from '@/enums'
 
 export const zh = {
   action: {
@@ -13,12 +13,34 @@ export const zh = {
     copied: '已复制',
     downloading: '准备下载',
     close: '关闭',
+    addToFavorites: '添加收藏',
+    removeFromFavorites: '取消收藏',
+    showFavorites: '收藏夹',
+    hideFavorites: '隐藏收藏夹',
+    applyFavorite: '应用',
+    deleteFavorite: '删除',
+    selectAll: '全选',
+    deselectAll: '取消全选',
+    deleteSelected: '删除选中',
+    exportFavorites: '导出收藏',
+    importFavorites: '导入收藏',
+    clearFavorites: '清空收藏夹',
   },
   label: {
     wrapperShape: '头像形状',
     borderColor: '边框颜色',
     backgroundColor: '背景颜色',
     colors: '颜色',
+    gender: '性别',
+    favorites: '收藏夹',
+    noFavorites: '暂无收藏',
+    favoritesEmpty: '收藏夹为空',
+    selectFile: '选择文件',
+  },
+  gender: {
+    [Gender.Male]: '男性',
+    [Gender.Female]: '女性',
+    [Gender.NotSet]: '不限',
   },
   widgetType: {
     [WidgetType.Face]: '脸蛋',
