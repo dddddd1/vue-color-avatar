@@ -1,4 +1,4 @@
-import { WidgetType } from '@/enums'
+import { Gender, WidgetType } from '@/enums'
 
 export const en = {
   action: {
@@ -13,12 +13,34 @@ export const en = {
     copied: 'Copied',
     downloading: 'Downloading',
     close: 'Close',
+    addToFavorites: 'Add to Favorites',
+    removeFromFavorites: 'Remove from Favorites',
+    showFavorites: 'Favorites',
+    hideFavorites: 'Hide Favorites',
+    applyFavorite: 'Apply',
+    deleteFavorite: 'Delete',
+    selectAll: 'Select All',
+    deselectAll: 'Deselect All',
+    deleteSelected: 'Delete Selected',
+    exportFavorites: 'Export',
+    importFavorites: 'Import',
+    clearFavorites: 'Clear All',
   },
   label: {
     wrapperShape: 'Avatar Shape',
     borderColor: 'Border Color',
     backgroundColor: 'Background Color',
     colors: 'colors',
+    gender: 'Gender',
+    favorites: 'Favorites',
+    noFavorites: 'No Favorites',
+    favoritesEmpty: 'Favorites is empty',
+    selectFile: 'Select File',
+  },
+  gender: {
+    [Gender.Male]: 'Male',
+    [Gender.Female]: 'Female',
+    [Gender.NotSet]: 'All',
   },
   widgetType: {
     [WidgetType.Face]: 'Face',

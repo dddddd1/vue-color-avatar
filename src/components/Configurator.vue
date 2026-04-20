@@ -1,6 +1,21 @@
 <template>
   <PerfectScrollbar class="configurator-scroll">
     <div class="configurator">
+      <SectionWrapper :title="t('label.gender')">
+        <ul class="gender-list">
+          <li
+            v-for="gender in genders"
+            :key="gender"
+            class="gender-list__item"
+            :class="{ active: avatarOption.gender === gender }"
+            @click="switchGender(gender)"
+          >
+            <span class="gender-icon">{{ getGenderIcon(gender) }}</span>
+            <span class="gender-label">{{ t(`gender.${gender}`) }}</span>
+          </li>
+        </ul>
+      </SectionWrapper>
+
       <SectionWrapper :title="t('label.wrapperShape')">
         <ul class="wrapper-shape">
           <li
@@ -117,7 +132,7 @@
 </template>
 
 <script lang="ts" setup>
-import { onMounted, reactive, ref } from 'vue'
+import { computed, onMounted, reactive, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import PerfectScrollbar from '@/components/PerfectScrollbar.vue'
@@ -126,6 +141,7 @@ import {
   type WidgetShape,
   type WrapperShape,
   BeardShape,
+  Gender,
   WidgetType,
 } from '@/enums'
 import { useAvatarOption } from '@/hooks'
@@ -135,6 +151,8 @@ import { previewData } from '@/utils/dynamic-data'
 const { t } = useI18n()
 
 const [avatarOption, setAvatarOption] = useAvatarOption()
+
+const genders = computed(() => [Gender.Male, Gender.Female, Gender.NotSet])
 
 const sectionList = reactive(Object.values(WidgetType))
 const sections = ref<
@@ -255,6 +273,25 @@ function getWidgetColor(type: string) {
     return avatarOption.value.widgets[type]?.fillColor
   } else return ''
 }
+
+function switchGender(gender: Gender) {
+  if (gender !== avatarOption.value.gender) {
+    setAvatarOption({ ...avatarOption.value, gender })
+  }
+}
+
+function getGenderIcon(gender: Gender): string {
+  switch (gender) {
+    case Gender.Male:
+      return '♂'
+    case Gender.Female:
+      return '♀'
+    case Gender.NotSet:
+      return '⚤'
+    default:
+      return ''
+  }
+}
 </script>
 
 <style lang="scss" scoped>
@@ -272,6 +309,40 @@ function getWidgetColor(type: string) {
 .configurator {
   width: 100%;
   color: var.$color-text;
+
+  .gender-list {
+    display: flex;
+    gap: 0.5rem;
+
+    .gender-list__item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      flex: 1;
+      padding: 0.8rem 0.5rem;
+      border-radius: 0.8rem;
+      cursor: pointer;
+      transition: all 0.2s;
+
+      &:hover {
+        background-color: lighten(var.$color-configurator, 3);
+      }
+
+      &.active {
+        background-color: lighten(var.$color-configurator, 6);
+      }
+
+      .gender-icon {
+        font-size: 1.5rem;
+        margin-bottom: 0.3rem;
+      }
+
+      .gender-label {
+        font-size: 0.8rem;
+      }
+    }
+  }
 
   .wrapper-shape {
     display: flex;
