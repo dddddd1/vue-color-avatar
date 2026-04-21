@@ -67,6 +67,9 @@
         v-for="s in sections"
         :key="s.widgetType"
         :title="t(`widgetType.${s.widgetType}`)"
+        :show-lock="true"
+        :is-locked="isWidgetLocked(s.widgetType)"
+        @toggle-lock="toggleWidgetLock(s.widgetType)"
       >
         <details
           v-if="
@@ -134,7 +137,7 @@ import { previewData } from '@/utils/dynamic-data'
 
 const { t } = useI18n()
 
-const [avatarOption, setAvatarOption] = useAvatarOption()
+const [avatarOption, setAvatarOption, toggleWidgetLock] = useAvatarOption()
 
 const sectionList = reactive(Object.values(WidgetType))
 const sections = ref<
@@ -147,6 +150,10 @@ const sections = ref<
     }[]
   }[]
 >([])
+
+function isWidgetLocked(widgetType: WidgetType): boolean {
+  return !!avatarOption.value.widgets?.[widgetType]?.locked
+}
 
 onMounted(() => {
   void (async () => {
@@ -167,10 +174,6 @@ onMounted(() => {
 
 async function getWidgets(widgetType: WidgetType) {
   const list = SETTINGS[`${widgetType}Shape`]
-  // const promises: Promise<string>[] = list.map(async (widget: string) => {
-  //   return (await import(`../assets/preview/${widgetType}/${widget}.svg?raw`))
-  //     .default
-  // })
   const promises: Promise<string>[] = list.map(async (widget: string) => {
     if (widget !== 'none' && previewData?.[widgetType]?.[widget]) {
       return (await previewData[widgetType][widget]()).default

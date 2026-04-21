@@ -106,6 +106,7 @@ import { useStore } from '@/store'
 import { REDO, UNDO } from '@/store/mutation-type'
 import {
   getRandomAvatarOption,
+  getRandomAvatarOptionWithLock,
   getSpecialAvatarOption,
   showConfetti,
 } from '@/utils'
@@ -140,7 +141,9 @@ function handleGenerate() {
     setAvatarOption(colorfulOption)
     showConfetti()
   } else {
-    const randomOption = getRandomAvatarOption(avatarOption.value)
+    const randomOption = getRandomAvatarOptionWithLock(avatarOption.value, {
+      wrapperShape: avatarOption.value.wrapperShape,
+    })
     setAvatarOption(randomOption)
   }
 

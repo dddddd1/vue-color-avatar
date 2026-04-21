@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 
-import { WrapperShape } from '@/enums'
+import { WidgetType, WrapperShape } from '@/enums'
 import type { AvatarOption } from '@/types'
 import { getRandomAvatarOption } from '@/utils'
 import { SCREEN } from '@/utils/constant'
@@ -9,6 +9,7 @@ import {
   REDO,
   SET_AVATAR_OPTION,
   SET_SIDER_STATUS,
+  TOGGLE_WIDGET_LOCK,
   UNDO,
 } from './mutation-type'
 
@@ -67,6 +68,28 @@ export const useStore = defineStore('store', {
     [SET_SIDER_STATUS](collapsed: boolean) {
       if (collapsed !== this.isSiderCollapsed) {
         this.isSiderCollapsed = collapsed
+      }
+    },
+
+    [TOGGLE_WIDGET_LOCK](widgetType: WidgetType) {
+      const currentOption = this.history.present
+      const widget = currentOption.widgets[widgetType]
+      if (widget) {
+        const newOption: AvatarOption = {
+          ...currentOption,
+          widgets: {
+            ...currentOption.widgets,
+            [widgetType]: {
+              ...widget,
+              locked: !widget.locked,
+            },
+          },
+        }
+        this.history = {
+          past: [...this.history.past, this.history.present],
+          present: newOption,
+          future: [],
+        }
       }
     },
   },
