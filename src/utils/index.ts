@@ -9,6 +9,38 @@ import type { AvatarOption, None } from '@/types'
 
 import { AVATAR_LAYER, NONE, SETTINGS, SPECIAL_AVATARS } from './constant'
 
+export function mergeWithLockedWidgets(
+  newOption: AvatarOption,
+  currentOption: AvatarOption
+): AvatarOption {
+  const { widgets: currentWidgets } = currentOption
+
+  if (!currentWidgets) {
+    return newOption
+  }
+
+  const resultWidgets: Record<string, unknown> = {
+    ...newOption.widgets,
+  }
+
+  const widgetKeys = Object.keys(currentWidgets)
+
+  for (const widgetType of widgetKeys) {
+    const currentWidget =
+      currentWidgets[widgetType as keyof typeof currentWidgets]
+    if (currentWidget?.locked) {
+      resultWidgets[widgetType] = {
+        ...currentWidget,
+      }
+    }
+  }
+
+  return {
+    ...newOption,
+    widgets: resultWidgets as AvatarOption['widgets'],
+  }
+}
+
 /**
  * Get a random value from an array.
  */
