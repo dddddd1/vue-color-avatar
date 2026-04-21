@@ -23,6 +23,7 @@ interface Widget<Shape> {
   zIndex?: number
   fillColor?: string
   strokeColor?: string
+  locked?: boolean
 }
 
 type AvatarWidgets = {

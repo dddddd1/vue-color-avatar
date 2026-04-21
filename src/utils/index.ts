@@ -72,7 +72,7 @@ export function getRandomAvatarOption(
         avoid: [
           useOption.background?.color,
           (hairShape === TopsShape.Punk || hairShape === TopsShape.Fonze) &&
-            hairColor, // Handle special cases and prevent color conflicts.
+            hairColor,
         ],
       }),
       borderColor: getRandomValue(SETTINGS.borderColor, {
@@ -128,7 +128,6 @@ export function getRandomAvatarOption(
       beard: {
         shape: beardShape,
 
-        // HACK:
         ...(beardShape === BeardShape.Scruff
           ? { zIndex: AVATAR_LAYER['mouth'].zIndex - 1 }
           : undefined),
@@ -138,6 +137,200 @@ export function getRandomAvatarOption(
           avoid: [useOption.widgets?.clothes?.shape],
         }),
         fillColor: getRandomFillColor(),
+      },
+    },
+  }
+
+  return avatarOption
+}
+
+export function getRandomAvatarOptionWithLock(
+  currentOption: AvatarOption,
+  presetOption: Partial<AvatarOption> = {}
+): AvatarOption {
+  const { widgets: currentWidgets } = currentOption
+
+  const isLocked = (widgetType: string): boolean => {
+    return !!currentWidgets?.[widgetType as keyof typeof currentWidgets]?.locked
+  }
+
+  const gender = isLocked('face')
+    ? currentOption.gender
+    : getRandomValue(SETTINGS.gender)
+
+  const beardList: BeardShape[] = []
+  let topList: TopsShape[] = [TopsShape.Danny, TopsShape.Wave, TopsShape.Pixie]
+
+  if (gender === Gender.Male) {
+    beardList.push(BeardShape.Scruff)
+    topList = SETTINGS.topsShape.filter((shape) => !topList.includes(shape))
+  }
+
+  const beardShape = isLocked('beard')
+    ? currentWidgets?.beard?.shape || BeardShape.None
+    : getRandomValue<BeardShape | None>(beardList, {
+        usually: [NONE],
+      })
+
+  const hairShape = isLocked('tops')
+    ? currentWidgets?.tops?.shape || getRandomValue(topList)
+    : getRandomValue(topList, {
+        avoid: [currentWidgets?.tops?.shape],
+      })
+
+  const hairColor = isLocked('tops')
+    ? currentWidgets?.tops?.fillColor || getRandomFillColor()
+    : getRandomFillColor()
+
+  const getWidgetValue = <T>(
+    widgetType: string,
+    getter: () => T,
+    currentValue?: T
+  ): T => {
+    if (isLocked(widgetType) && currentValue !== undefined) {
+      return currentValue
+    }
+    return getter()
+  }
+
+  const avatarOption: AvatarOption = {
+    gender,
+
+    wrapperShape:
+      presetOption?.wrapperShape || getRandomValue(SETTINGS.wrapperShape),
+
+    background: {
+      color: getRandomValue(SETTINGS.backgroundColor, {
+        avoid: [
+          currentOption.background?.color,
+          (hairShape === TopsShape.Punk || hairShape === TopsShape.Fonze) &&
+            hairColor,
+        ],
+      }),
+      borderColor: getRandomValue(SETTINGS.borderColor, {
+        avoid: [currentOption.background?.color],
+        usually: ['transparent'],
+      }),
+    },
+
+    widgets: {
+      face: {
+        ...currentWidgets?.face,
+        shape: getWidgetValue(
+          'face',
+          () => getRandomValue(SETTINGS.faceShape),
+          currentWidgets?.face?.shape
+        ),
+        fillColor: getWidgetValue(
+          'face',
+          () => getRandomFillColor(SETTINGS.skinColors),
+          currentWidgets?.face?.fillColor
+        ),
+      },
+      tops: {
+        ...currentWidgets?.tops,
+        shape: hairShape,
+        fillColor: hairColor,
+      },
+      ear: {
+        ...currentWidgets?.ear,
+        shape: getWidgetValue(
+          'ear',
+          () =>
+            getRandomValue(SETTINGS.earShape, {
+              avoid: [currentWidgets?.ear?.shape],
+            }),
+          currentWidgets?.ear?.shape
+        ),
+      },
+      earrings: {
+        ...currentWidgets?.earrings,
+        shape: getWidgetValue(
+          'earrings',
+          () =>
+            getRandomValue<EarringsShape | None>(SETTINGS.earringsShape, {
+              usually: [NONE],
+            }),
+          currentWidgets?.earrings?.shape
+        ),
+      },
+      eyebrows: {
+        ...currentWidgets?.eyebrows,
+        shape: getWidgetValue(
+          'eyebrows',
+          () =>
+            getRandomValue(SETTINGS.eyebrowsShape, {
+              avoid: [currentWidgets?.eyebrows?.shape],
+            }),
+          currentWidgets?.eyebrows?.shape
+        ),
+      },
+      eyes: {
+        ...currentWidgets?.eyes,
+        shape: getWidgetValue(
+          'eyes',
+          () =>
+            getRandomValue(SETTINGS.eyesShape, {
+              avoid: [currentWidgets?.eyes?.shape],
+            }),
+          currentWidgets?.eyes?.shape
+        ),
+      },
+      nose: {
+        ...currentWidgets?.nose,
+        shape: getWidgetValue(
+          'nose',
+          () =>
+            getRandomValue(SETTINGS.noseShape, {
+              avoid: [currentWidgets?.nose?.shape],
+            }),
+          currentWidgets?.nose?.shape
+        ),
+      },
+      glasses: {
+        ...currentWidgets?.glasses,
+        shape: getWidgetValue(
+          'glasses',
+          () =>
+            getRandomValue<GlassesShape | None>(SETTINGS.glassesShape, {
+              usually: [NONE],
+            }),
+          currentWidgets?.glasses?.shape
+        ),
+      },
+      mouth: {
+        ...currentWidgets?.mouth,
+        shape: getWidgetValue(
+          'mouth',
+          () =>
+            getRandomValue(SETTINGS.mouthShape, {
+              avoid: [currentWidgets?.mouth?.shape],
+            }),
+          currentWidgets?.mouth?.shape
+        ),
+      },
+      beard: {
+        ...currentWidgets?.beard,
+        shape: beardShape,
+        ...(beardShape === BeardShape.Scruff
+          ? { zIndex: AVATAR_LAYER['mouth'].zIndex - 1 }
+          : undefined),
+      },
+      clothes: {
+        ...currentWidgets?.clothes,
+        shape: getWidgetValue(
+          'clothes',
+          () =>
+            getRandomValue(SETTINGS.clothesShape, {
+              avoid: [currentWidgets?.clothes?.shape],
+            }),
+          currentWidgets?.clothes?.shape
+        ),
+        fillColor: getWidgetValue(
+          'clothes',
+          () => getRandomFillColor(),
+          currentWidgets?.clothes?.fillColor
+        ),
       },
     },
   }

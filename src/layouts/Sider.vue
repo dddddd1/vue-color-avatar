@@ -1,5 +1,10 @@
 <template>
   <aside class="sider" :class="{ collapsed: isCollapsed }">
+    <div class="sider-header">
+      <div class="avatar-preview">
+        <VueColorAvatar :option="avatarOption" :size="120" />
+      </div>
+    </div>
     <slot />
 
     <div class="trigger" @click="isCollapsed ? openSider() : closeSider()">
@@ -10,9 +15,12 @@
 
 <script lang="ts" setup>
 import IconRight from '@/assets/icons/icon-right.svg'
+import VueColorAvatar from '@/components/VueColorAvatar.vue'
+import { useAvatarOption } from '@/hooks'
 import { useSider } from '@/hooks'
 
 const { isCollapsed, openSider, closeSider } = useSider()
+const [avatarOption] = useAvatarOption()
 </script>
 
 <style lang="scss" scoped>
@@ -39,6 +47,22 @@ const { isCollapsed, openSider, closeSider } = useSider()
 
     .icon-right {
       transform: rotateY(-180deg);
+    }
+  }
+
+  .sider-header {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 1.5rem 1rem;
+    background-color: darken(var.$color-configurator, 2);
+    border-bottom: 1px solid darken(var.$color-configurator, 5);
+
+    .avatar-preview {
+      background-color: #fff;
+      border-radius: 50%;
+      padding: 0.5rem;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     }
   }
 

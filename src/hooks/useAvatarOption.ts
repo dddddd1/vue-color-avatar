@@ -1,7 +1,8 @@
 import { computed } from 'vue'
 
+import { WidgetType } from '@/enums'
 import { useStore } from '@/store'
-import { SET_AVATAR_OPTION } from '@/store/mutation-type'
+import { SET_AVATAR_OPTION, TOGGLE_WIDGET_LOCK } from '@/store/mutation-type'
 import type { AvatarOption } from '@/types'
 
 export function useAvatarOption() {
@@ -13,5 +14,9 @@ export function useAvatarOption() {
     store[SET_AVATAR_OPTION](newOption)
   }
 
-  return [avatarOption, setAvatarOption] as const
+  const toggleWidgetLock = (widgetType: WidgetType) => {
+    store[TOGGLE_WIDGET_LOCK](widgetType)
+  }
+
+  return [avatarOption, setAvatarOption, toggleWidgetLock] as const
 }
