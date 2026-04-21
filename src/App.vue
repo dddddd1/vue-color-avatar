@@ -108,6 +108,7 @@ import {
   getRandomAvatarOption,
   getRandomAvatarOptionWithLock,
   getSpecialAvatarOption,
+  mergeWithLockedWidgets,
   showConfetti,
 } from '@/utils'
 import {
@@ -130,6 +131,8 @@ const { t } = useI18n()
 const colorAvatarRef = ref<VueColorAvatarRef>()
 
 function handleGenerate() {
+  let newOption: AvatarOption
+
   if (Math.random() <= TRIGGER_PROBABILITY) {
     let colorfulOption = getSpecialAvatarOption()
     while (
@@ -138,14 +141,16 @@ function handleGenerate() {
       colorfulOption = getSpecialAvatarOption()
     }
     colorfulOption.wrapperShape = avatarOption.value.wrapperShape
-    setAvatarOption(colorfulOption)
+    newOption = colorfulOption
     showConfetti()
   } else {
-    const randomOption = getRandomAvatarOptionWithLock(avatarOption.value, {
+    newOption = getRandomAvatarOptionWithLock(avatarOption.value, {
       wrapperShape: avatarOption.value.wrapperShape,
     })
-    setAvatarOption(randomOption)
   }
+
+  const finalOption = mergeWithLockedWidgets(newOption, avatarOption.value)
+  setAvatarOption(finalOption)
 
   recordEvent('click_randomize', {
     event_category: 'click',
