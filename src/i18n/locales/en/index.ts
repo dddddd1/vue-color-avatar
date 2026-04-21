@@ -35,6 +35,7 @@ export const en = {
     favorites: 'Favorites',
     noFavorites: 'No Favorites',
     favoritesEmpty: 'Favorites is empty',
+    favoritesHint: 'Click "Add to Favorites" button to save your favorite avatars',
     selectFile: 'Select File',
   },
   gender: {

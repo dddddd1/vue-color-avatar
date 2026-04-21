@@ -35,6 +35,7 @@ export const zh = {
     favorites: '收藏夹',
     noFavorites: '暂无收藏',
     favoritesEmpty: '收藏夹为空',
+    favoritesHint: '点击「添加收藏」按钮保存你喜欢的头像',
     selectFile: '选择文件',
   },
   gender: {
