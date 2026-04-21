@@ -101,6 +101,7 @@
         <div v-else class="favorites-empty">
           <div class="empty-icon">⭐</div>
           <p>{{ t('label.favoritesEmpty') }}</p>
+          <p class="empty-hint">{{ t('label.favoritesHint') }}</p>
         </div>
       </div>
     </div>
@@ -251,13 +252,14 @@ defineExpose({
 .fade-enter-active,
 .fade-leave-active {
   @media (prefers-reduced-motion: no-preference) {
-    transition: opacity 0.25s ease, transform 0.2s;
+    transition: opacity 0.3s ease, transform 0.3s ease;
   }
 }
 
 .fade-enter-from,
 .fade-leave-to {
   opacity: 0;
+  transform: scale(0.95);
 }
 
 .favorites-panel-overlay {
@@ -267,57 +269,70 @@ defineExpose({
   z-index: 999;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.6);
-  backdrop-filter: blur(0.1rem);
+  background-color: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(8px);
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 1rem;
+  padding: 1.5rem;
   box-sizing: border-box;
 }
 
 .favorites-panel {
   width: 100%;
-  max-width: 900px;
+  max-width: 1000px;
   max-height: 85vh;
   background-color: var.$color-configurator;
-  border-radius: 1rem;
+  border-radius: 1.2rem;
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+  box-shadow: 
+    0 25px 50px -12px rgba(0, 0, 0, 0.4),
+    0 0 0 1px rgba(255, 255, 255, 0.05);
 
   .favorites-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 1.2rem 1.5rem;
-    border-bottom: 1px solid rgba(var.$color-text, 0.1);
+    padding: 1.2rem 1.8rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
     flex-shrink: 0;
+    background: linear-gradient(180deg, rgba(255,255,255,0.03) 0%, transparent 100%);
 
     .favorites-title {
       margin: 0;
-      font-size: 1.3rem;
-      font-weight: bold;
+      font-size: 1.4rem;
+      font-weight: 700;
       color: var.$color-text;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+
+      &::before {
+        content: '⭐';
+        font-size: 1.2rem;
+      }
     }
 
     .close-btn {
-      width: 32px;
-      height: 32px;
+      width: 36px;
+      height: 36px;
       border: none;
-      background-color: transparent;
+      background-color: rgba(255, 255, 255, 0.08);
       color: var.$color-text;
       font-size: 1.5rem;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      border-radius: 50%;
-      transition: all 0.2s;
+      border-radius: 0.6rem;
+      transition: all 0.2s ease;
+      line-height: 1;
 
       &:hover {
-        background-color: lighten(var.$color-configurator, 10);
+        background-color: rgba(255, 255, 255, 0.15);
+        transform: rotate(90deg);
       }
     }
   }
@@ -325,85 +340,123 @@ defineExpose({
   .favorites-toolbar {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
-    padding: 0.8rem 1.5rem;
-    border-bottom: 1px solid rgba(var.$color-text, 0.05);
+    gap: 0.6rem;
+    padding: 1rem 1.8rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
     flex-shrink: 0;
     flex-wrap: wrap;
+    background-color: rgba(255, 255, 255, 0.02);
   }
 
   .favorites-content {
     flex: 1;
     overflow-y: auto;
-    padding: 1rem;
+    padding: 1.5rem;
+
+    &::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.03);
+      border-radius: 4px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 4px;
+
+      &:hover {
+        background: rgba(255, 255, 255, 0.25);
+      }
+    }
   }
 
   .favorites-list {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-    gap: 0.8rem;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1rem;
   }
 
   .favorite-item {
     display: flex;
     align-items: center;
-    padding: 0.8rem;
-    background-color: lighten(var.$color-configurator, 3);
-    border-radius: 0.6rem;
-    transition: all 0.2s;
+    padding: 1rem;
+    background-color: rgba(255, 255, 255, 0.04);
+    border-radius: 0.8rem;
+    transition: all 0.2s ease;
     border: 2px solid transparent;
+    position: relative;
+    cursor: pointer;
+
+    &:hover {
+      background-color: rgba(255, 255, 255, 0.08);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px -5px rgba(0, 0, 0, 0.2);
+    }
 
     &.selected {
       border-color: var.$color-accent;
-      background-color: lighten(var.$color-configurator, 8);
+      background-color: rgba(var.$color-accent, 0.1);
+      box-shadow: 0 0 0 3px rgba(var.$color-accent, 0.2);
     }
 
     .favorite-checkbox {
-      width: 22px;
-      height: 22px;
-      border: 2px solid var.$color-text;
-      border-radius: 4px;
+      width: 24px;
+      height: 24px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-radius: 6px;
       display: flex;
       align-items: center;
       justify-content: center;
       cursor: pointer;
-      margin-right: 0.8rem;
-      transition: all 0.2s;
+      margin-right: 1rem;
+      transition: all 0.2s ease;
+      flex-shrink: 0;
+
+      &:hover {
+        border-color: var.$color-accent;
+        background-color: rgba(var.$color-accent, 0.1);
+      }
 
       .checkmark {
         color: var.$color-accent;
         font-weight: bold;
-        font-size: 0.8rem;
+        font-size: 0.9rem;
       }
     }
 
     .favorite-preview {
-      width: 60px;
-      height: 60px;
+      width: 70px;
+      height: 70px;
       flex-shrink: 0;
+      border-radius: 0.6rem;
+      overflow: hidden;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     }
 
     .favorite-info {
       flex: 1;
-      margin-left: 0.8rem;
+      margin-left: 1rem;
       min-width: 0;
 
       .favorite-gender {
         display: flex;
         align-items: center;
-        gap: 0.2rem;
-        font-size: 0.85rem;
+        gap: 0.4rem;
+        font-size: 0.9rem;
+        font-weight: 600;
         color: var.$color-text;
 
         .gender-icon {
-          font-size: 1rem;
+          font-size: 1.1rem;
         }
       }
 
       .favorite-time {
-        font-size: 0.7rem;
-        color: darken(var.$color-text, 25);
-        margin-top: 0.2rem;
+        font-size: 0.75rem;
+        color: rgba(255, 255, 255, 0.5);
+        margin-top: 0.3rem;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
@@ -412,26 +465,37 @@ defineExpose({
 
     .favorite-actions {
       display: flex;
-      gap: 0.2rem;
+      gap: 0.4rem;
       flex-shrink: 0;
+      opacity: 0;
+      transition: opacity 0.2s ease;
 
       .action-icon-btn {
-        width: 28px;
-        height: 28px;
+        width: 32px;
+        height: 32px;
         border: none;
-        background-color: lighten(var.$color-configurator, 8);
-        border-radius: 0.3rem;
+        background-color: rgba(255, 255, 255, 0.1);
+        border-radius: 0.5rem;
         cursor: pointer;
         display: flex;
         align-items: center;
         justify-content: center;
-        transition: all 0.2s;
-        font-size: 0.9rem;
+        transition: all 0.2s ease;
+        font-size: 1rem;
 
         &:hover {
-          background-color: lighten(var.$color-configurator, 15);
+          background-color: var.$color-accent;
+          transform: scale(1.05);
+        }
+
+        &:last-child:hover {
+          background-color: #ff6b6b;
         }
       }
+    }
+
+    &:hover .favorite-actions {
+      opacity: 1;
     }
   }
 
@@ -441,46 +505,70 @@ defineExpose({
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    color: darken(var.$color-text, 35);
-    padding: 2rem;
+    color: rgba(255, 255, 255, 0.4);
+    padding: 3rem;
+    text-align: center;
 
     .empty-icon {
-      font-size: 3rem;
-      margin-bottom: 1rem;
+      font-size: 4rem;
+      margin-bottom: 1.5rem;
+      opacity: 0.6;
     }
 
     p {
       margin: 0;
-      font-size: 1rem;
+      font-size: 1.1rem;
+      font-weight: 500;
+    }
+
+    .empty-hint {
+      font-size: 0.85rem;
+      margin-top: 0.5rem;
+      opacity: 0.7;
     }
   }
 
   .action-btn {
-    padding: 0.4rem 0.8rem;
+    padding: 0.5rem 1rem;
     border: none;
-    background-color: lighten(var.$color-configurator, 8);
+    background-color: rgba(255, 255, 255, 0.08);
     color: var.$color-text;
-    border-radius: 0.4rem;
+    border-radius: 0.5rem;
     cursor: pointer;
-    font-size: 0.8rem;
-    transition: all 0.2s;
+    font-size: 0.85rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
     white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
 
     &:hover {
-      background-color: lighten(var.$color-configurator, 15);
+      background-color: rgba(255, 255, 255, 0.15);
+      transform: translateY(-1px);
     }
 
     &.action-small {
-      padding: 0.3rem 0.6rem;
-      font-size: 0.75rem;
+      padding: 0.35rem 0.7rem;
+      font-size: 0.8rem;
     }
 
     &.action-danger {
-      background-color: #ff6b6b;
+      background-color: rgba(255, 107, 107, 0.2);
+      color: #ff6b6b;
+
+      &:hover {
+        background-color: #ff6b6b;
+        color: white;
+      }
+    }
+
+    &.action-primary {
+      background-color: var.$color-accent;
       color: white;
 
       &:hover {
-        background-color: #ff5252;
+        background-color: lighten(var.$color-accent, 10);
       }
     }
   }
@@ -502,22 +590,37 @@ defineExpose({
 
 @media screen and (max-width: var.$screen-sm) {
   .favorites-panel-overlay {
-    padding: 0.5rem;
+    padding: 0.8rem;
   }
 
   .favorites-panel {
     max-height: 95vh;
+    border-radius: 1rem;
 
     .favorites-header {
-      padding: 1rem;
+      padding: 1rem 1.2rem;
+
+      .favorites-title {
+        font-size: 1.2rem;
+      }
     }
 
     .favorites-toolbar {
-      padding: 0.6rem 1rem;
+      padding: 0.8rem 1.2rem;
+    }
+
+    .favorites-content {
+      padding: 1rem;
     }
 
     .favorites-list {
       grid-template-columns: 1fr;
+    }
+
+    .favorite-item {
+      .favorite-actions {
+        opacity: 1;
+      }
     }
   }
 }

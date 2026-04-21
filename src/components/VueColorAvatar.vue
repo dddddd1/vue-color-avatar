@@ -122,16 +122,20 @@ watchEffect(async () => {
     })
   })
 
+  const viewBoxSize = avatarSize.value / 0.7
+  const transformX = (100 / 400) * viewBoxSize
+  const transformY = (65 / 400) * viewBoxSize
+
   svgContent.value = `
     <svg
       width="${avatarSize.value}"
       height="${avatarSize.value}"
-      viewBox="0 0 ${avatarSize.value / 0.7} ${avatarSize.value / 0.7}"
+      viewBox="0 0 ${viewBoxSize} ${viewBoxSize}"
       preserveAspectRatio="xMidYMax meet"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
     >
-      <g transform="translate(100, 65)">
+      <g transform="translate(${transformX}, ${transformY})">
         ${svgRawList.join('')}
       </g>
     </svg>
