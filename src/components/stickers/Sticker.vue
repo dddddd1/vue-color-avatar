@@ -1,5 +1,6 @@
 <template>
   <div
+    ref="stickerWrapperRef"
     class="sticker-wrapper"
     :class="{ 'is-selected': isSelected }"
     :style="wrapperStyle"
@@ -95,6 +96,7 @@ const emit = defineEmits<{
 }>()
 
 const stickerSvg = ref('')
+const stickerWrapperRef = ref<HTMLDivElement>()
 
 watch(
   () => props.sticker,
@@ -108,14 +110,17 @@ watch(
   { immediate: true, deep: true }
 )
 
+const stickerWidth = computed(() => 40 * props.sticker.scale)
+const stickerHeight = computed(() => 40 * props.sticker.scale)
+
 const wrapperStyle = computed(() => ({
   position: 'absolute' as const,
   left: `${props.sticker.x}px`,
   top: `${props.sticker.y}px`,
   zIndex: props.sticker.zIndex,
   opacity: props.sticker.opacity,
-  width: `${40 * props.sticker.scale}px`,
-  height: `${40 * props.sticker.scale}px`,
+  width: `${stickerWidth.value}px`,
+  height: `${stickerHeight.value}px`,
 }))
 
 const contentStyle = computed(() => ({
@@ -143,7 +148,33 @@ function getEventPosition(e: MouseEvent | TouchEvent) {
   return { x: e.clientX, y: e.clientY }
 }
 
+function getParentContainer(): HTMLElement | null {
+  if (!stickerWrapperRef.value) return null
+  let parent = stickerWrapperRef.value.parentElement
+  while (parent && !parent.classList.contains('stickers-layer')) {
+    parent = parent.parentElement
+  }
+  return parent
+}
+
+function clampPosition(x: number, y: number): { x: number; y: number } {
+  const parent = getParentContainer()
+  if (!parent) return { x, y }
+  
+  const parentRect = parent.getBoundingClientRect()
+  const minX = -stickerWidth.value / 2
+  const minY = -stickerHeight.value / 2
+  const maxX = parentRect.width - stickerWidth.value / 2
+  const maxY = parentRect.height - stickerHeight.value / 2
+  
+  return {
+    x: Math.max(minX, Math.min(maxX, x)),
+    y: Math.max(minY, Math.min(maxY, y)),
+  }
+}
+
 function handleMouseDown(e: MouseEvent) {
+  e.preventDefault()
   const pos = getEventPosition(e)
   isDragging.value = true
   dragStartX.value = pos.x
@@ -175,11 +206,12 @@ function handleTouchStart(e: TouchEvent) {
     emit('select', props.sticker.id)
   }
   
-  window.addEventListener('touchmove', handleTouchMove)
+  window.addEventListener('touchmove', handleTouchMove, { passive: false })
   window.addEventListener('touchend', handleTouchEnd)
 }
 
 function handleMouseMove(e: MouseEvent) {
+  e.preventDefault()
   if (!isDragging.value && !isResizing.value && !isRotating.value) return
   
   const pos = getEventPosition(e)
@@ -188,9 +220,14 @@ function handleMouseMove(e: MouseEvent) {
     const dx = pos.x - dragStartX.value
     const dy = pos.y - dragStartY.value
     
+    let newX = initialX.value + dx
+    let newY = initialY.value + dy
+    
+    const clamped = clampPosition(newX, newY)
+    
     emit('update', {
-      x: initialX.value + dx,
-      y: initialY.value + dy,
+      x: clamped.x,
+      y: clamped.y,
     })
   }
   
@@ -230,14 +267,20 @@ function handleMouseMove(e: MouseEvent) {
 }
 
 function handleTouchMove(e: TouchEvent) {
+  e.preventDefault()
   if (e.touches.length === 1 && isDragging.value) {
     const pos = getEventPosition(e)
     const dx = pos.x - dragStartX.value
     const dy = pos.y - dragStartY.value
     
+    let newX = initialX.value + dx
+    let newY = initialY.value + dy
+    
+    const clamped = clampPosition(newX, newY)
+    
     emit('update', {
-      x: initialX.value + dx,
-      y: initialY.value + dy,
+      x: clamped.x,
+      y: clamped.y,
     })
   } else if (e.touches.length === 2 && isResizing.value) {
     const dx = e.touches[0].clientX - e.touches[1].clientX
@@ -278,6 +321,7 @@ function handleResizeStart(
   e: MouseEvent | TouchEvent,
   handle: string
 ) {
+  e.preventDefault()
   const pos = getEventPosition(e)
   isResizing.value = true
   resizeHandle.value = handle
@@ -287,6 +331,7 @@ function handleResizeStart(
 }
 
 function handleRotateStart(e: MouseEvent | TouchEvent) {
+  e.preventDefault()
   const pos = getEventPosition(e)
   isRotating.value = true
   dragStartX.value = pos.x
