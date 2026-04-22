@@ -354,7 +354,7 @@ defineExpose({
 
     .festival-tab {
       padding: 0.5rem 1rem;
-      border: 1px solid var.$color-border;
+      border: 1px solid var.$color-text;
       border-radius: 0.5rem;
       background: transparent;
       color: var.$color-text;
@@ -501,7 +501,7 @@ defineExpose({
 
   .sticker-adjustments {
     padding-top: 1rem;
-    border-top: 1px solid var.$color-border;
+    border-top: 1px solid var.$color-text;
 
     .adjustment-group {
       display: flex;
@@ -560,7 +560,7 @@ defineExpose({
       .reset-btn {
         padding: 0.5rem 1rem;
         background: transparent;
-        border: 1px solid var.$color-border;
+        border: 1px solid var.$color-text;
         border-radius: 0.25rem;
         color: var.$color-text;
         cursor: pointer;
