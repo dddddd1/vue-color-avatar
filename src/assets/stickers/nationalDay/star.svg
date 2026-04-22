@@ -1,23 +1,17 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100">
   <defs>
-    <linearGradient id="moonGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#fff9e6;stop-opacity:1" />
-      <stop offset="50%" style="stop-color:#ffeaa7;stop-opacity:1" />
-      <stop offset="100%" style="stop-color:#fdcb6e;stop-opacity:1" />
+    <linearGradient id="starGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#ffeb3b;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#ffc107;stop-opacity:1" />
     </linearGradient>
-    <radialGradient id="glowGrad" cx="50%" cy="50%" r="50%">
-      <stop offset="0%" style="stop-color:#fff9e6;stop-opacity:0.8" />
-      <stop offset="100%" style="stop-color:#ffeaa7;stop-opacity:0" />
-    </radialGradient>
   </defs>
   
-  <circle cx="50" cy="50" r="48" fill="url(#glowGrad)"/>
+  <path d="M50,10 L61,40 L95,40 L68,58 L79,90 L50,72 L21,90 L32,58 L5,40 L39,40 Z" 
+        fill="url(#starGradient)" 
+        stroke="#ff9800" 
+        stroke-width="2"/>
   
-  <circle cx="50" cy="50" r="40" fill="url(#moonGrad)"/>
-  
-  <ellipse cx="35" cy="40" rx="8" ry="6" fill="#f8d7da" opacity="0.5"/>
-  <ellipse cx="65" cy="55" rx="6" ry="5" fill="#f8d7da" opacity="0.4"/>
-  <ellipse cx="45" cy="65" rx="5" ry="4" fill="#f8d7da" opacity="0.3"/>
-  
-  <circle cx="50" cy="50" r="40" fill="none" stroke="#e17055" stroke-width="2"/>
+  <path d="M50,20 L56,38 L75,38 L60,50 L66,68 L50,58 L34,68 L40,50 L25,38 L44,38 Z" 
+        fill="#fff9c4" 
+        opacity="0.6"/>
 </svg>
