@@ -8,10 +8,12 @@ import {
   EyebrowsShape,
   EyesShape,
   FaceShape,
+  FestivalType,
   Gender,
   GlassesShape,
   MouthShape,
   NoseShape,
+  StickerShape,
   TopsShape,
   WidgetType,
   WrapperShape,
@@ -53,6 +55,9 @@ export const AVATAR_LAYER: Readonly<{
   [WidgetType.Clothes]: {
     zIndex: 110,
   },
+  [WidgetType.Stickers]: {
+    zIndex: 200,
+  },
 }
 
 export const SETTINGS: Readonly<AvatarSettings> = {
@@ -70,6 +75,7 @@ export const SETTINGS: Readonly<AvatarSettings> = {
   mouthShape: Object.values(MouthShape),
   beardShape: Object.values(BeardShape),
   clothesShape: Object.values(ClothesShape),
+  stickersShape: Object.values(StickerShape),
 
   commonColors: [
     '#6BD9E9',
@@ -103,6 +109,27 @@ export const SETTINGS: Readonly<AvatarSettings> = {
   get borderColor() {
     return [...this.commonColors, 'transparent']
   },
+}
+
+export const FESTIVAL_STICKERS: Readonly<{
+  [key in FestivalType]: StickerShape[]
+}> = {
+  [FestivalType.SpringFestival]: [
+    StickerShape.RedLantern,
+    StickerShape.Firecracker,
+    StickerShape.FuCharacter,
+    StickerShape.Fireworks,
+  ],
+  [FestivalType.MidAutumnFestival]: [
+    StickerShape.Mooncake,
+    StickerShape.Rabbit,
+    StickerShape.Osmanthus,
+  ],
+  [FestivalType.NationalDay]: [
+    StickerShape.NationalFlag,
+    StickerShape.Tiananmen,
+    StickerShape.Fireworks,
+  ],
 }
 
 export const SCREEN = {
@@ -158,6 +185,7 @@ export const SPECIAL_AVATARS: Readonly<AvatarOption[]> = [
         fillColor: '#e0ddff',
       },
     },
+    stickers: [],
   },
   {
     wrapperShape: 'squircle',
@@ -202,6 +230,7 @@ export const SPECIAL_AVATARS: Readonly<AvatarOption[]> = [
         fillColor: '#f4d150',
       },
     },
+    stickers: [],
   },
 ]
 
