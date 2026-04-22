@@ -1,11 +1,10 @@
 <template>
   <div
-    ref="stickerWrapperRef"
     class="sticker-wrapper"
     :class="{ 'is-selected': isSelected }"
     :style="wrapperStyle"
-    @mousedown="handleMouseDown"
-    @touchstart="handleTouchStart"
+    @mousedown="onMouseDown"
+    @touchstart="onTouchStart"
   >
     <div
       class="sticker-content"
@@ -16,33 +15,33 @@
     <div
       v-if="isSelected"
       class="sticker-handle sticker-handle--top-left"
-      @mousedown.stop="(e) => handleResizeStart(e, 'top-left')"
-      @touchstart.stop="(e) => handleResizeStart(e, 'top-left')"
+      @mousedown.stop="onResizeStart($event, 'top-left')"
+      @touchstart.stop="onResizeStart($event, 'top-left')"
     />
     <div
       v-if="isSelected"
       class="sticker-handle sticker-handle--top-right"
-      @mousedown.stop="(e) => handleResizeStart(e, 'top-right')"
-      @touchstart.stop="(e) => handleResizeStart(e, 'top-right')"
+      @mousedown.stop="onResizeStart($event, 'top-right')"
+      @touchstart.stop="onResizeStart($event, 'top-right')"
     />
     <div
       v-if="isSelected"
       class="sticker-handle sticker-handle--bottom-left"
-      @mousedown.stop="(e) => handleResizeStart(e, 'bottom-left')"
-      @touchstart.stop="(e) => handleResizeStart(e, 'bottom-left')"
+      @mousedown.stop="onResizeStart($event, 'bottom-left')"
+      @touchstart.stop="onResizeStart($event, 'bottom-left')"
     />
     <div
       v-if="isSelected"
       class="sticker-handle sticker-handle--bottom-right"
-      @mousedown.stop="(e) => handleResizeStart(e, 'bottom-right')"
-      @touchstart.stop="(e) => handleResizeStart(e, 'bottom-right')"
+      @mousedown.stop="onResizeStart($event, 'bottom-right')"
+      @touchstart.stop="onResizeStart($event, 'bottom-right')"
     />
     
     <div
       v-if="isSelected"
       class="sticker-handle sticker-handle--rotate"
-      @mousedown.stop="handleRotateStart"
-      @touchstart.stop="handleRotateStart"
+      @mousedown.stop="onRotateStart"
+      @touchstart.stop="onRotateStart"
     >
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
         <path
@@ -55,7 +54,7 @@
     <div
       v-if="isSelected"
       class="sticker-remove"
-      @click.stop="handleRemove"
+      @click.stop="onRemove"
     >
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
         <path
@@ -96,7 +95,6 @@ const emit = defineEmits<{
 }>()
 
 const stickerSvg = ref('')
-const stickerWrapperRef = ref<HTMLDivElement>()
 
 watch(
   () => props.sticker,
@@ -132,225 +130,183 @@ const contentStyle = computed(() => ({
 const isDragging = ref(false)
 const isResizing = ref(false)
 const isRotating = ref(false)
-const dragStartX = ref(0)
-const dragStartY = ref(0)
-const initialX = ref(0)
-const initialY = ref(0)
-const initialScale = ref(1)
-const initialRotation = ref(0)
-const resizeHandle = ref<string | null>(null)
-const initialDistance = ref(0)
 
-function getEventPosition(e: MouseEvent | TouchEvent) {
-  if ('touches' in e) {
+const startClientX = ref(0)
+const startClientY = ref(0)
+const startStickerX = ref(0)
+const startStickerY = ref(0)
+const startStickerScale = ref(1)
+const startStickerRotation = ref(0)
+const resizeHandle = ref<string | null>(null)
+const pinchStartDistance = ref(0)
+
+function getClientPos(e: MouseEvent | TouchEvent): { x: number; y: number } {
+  if ('touches' in e && e.touches.length > 0) {
     return { x: e.touches[0].clientX, y: e.touches[0].clientY }
   }
-  return { x: e.clientX, y: e.clientY }
-}
-
-function getParentContainer(): HTMLElement | null {
-  if (!stickerWrapperRef.value) return null
-  let parent = stickerWrapperRef.value.parentElement
-  while (parent && !parent.classList.contains('stickers-layer')) {
-    parent = parent.parentElement
+  if ('clientX' in e) {
+    return { x: e.clientX, y: e.clientY }
   }
-  return parent
+  return { x: 0, y: 0 }
 }
 
-function clampPosition(x: number, y: number): { x: number; y: number } {
-  const parent = getParentContainer()
-  if (!parent) return { x, y }
-  
-  const parentRect = parent.getBoundingClientRect()
-  const minX = -stickerWidth.value / 2
-  const minY = -stickerHeight.value / 2
-  const maxX = parentRect.width - stickerWidth.value / 2
-  const maxY = parentRect.height - stickerHeight.value / 2
-  
-  return {
-    x: Math.max(minX, Math.min(maxX, x)),
-    y: Math.max(minY, Math.min(maxY, y)),
-  }
+function emitUpdate(data: Partial<Sticker>) {
+  emit('update', data)
 }
 
-function handleMouseDown(e: MouseEvent) {
-  e.preventDefault()
-  const pos = getEventPosition(e)
+function onMouseDown(e: MouseEvent) {
+  const pos = getClientPos(e)
   isDragging.value = true
-  dragStartX.value = pos.x
-  dragStartY.value = pos.y
-  initialX.value = props.sticker.x
-  initialY.value = props.sticker.y
+  startClientX.value = pos.x
+  startClientY.value = pos.y
+  startStickerX.value = props.sticker.x
+  startStickerY.value = props.sticker.y
   emit('select', props.sticker.id)
   
-  window.addEventListener('mousemove', handleMouseMove)
-  window.addEventListener('mouseup', handleMouseUp)
+  document.addEventListener('mousemove', onMouseMove)
+  document.addEventListener('mouseup', onMouseUp)
 }
 
-function handleTouchStart(e: TouchEvent) {
+function onTouchStart(e: TouchEvent) {
   if (e.touches.length === 1) {
-    const pos = getEventPosition(e)
+    const pos = getClientPos(e)
     isDragging.value = true
-    dragStartX.value = pos.x
-    dragStartY.value = pos.y
-    initialX.value = props.sticker.x
-    initialY.value = props.sticker.y
+    startClientX.value = pos.x
+    startClientY.value = pos.y
+    startStickerX.value = props.sticker.x
+    startStickerY.value = props.sticker.y
     emit('select', props.sticker.id)
   } else if (e.touches.length === 2) {
     isResizing.value = true
     resizeHandle.value = 'pinch'
     const dx = e.touches[0].clientX - e.touches[1].clientX
     const dy = e.touches[0].clientY - e.touches[1].clientY
-    initialDistance.value = Math.sqrt(dx * dx + dy * dy)
-    initialScale.value = props.sticker.scale
+    pinchStartDistance.value = Math.sqrt(dx * dx + dy * dy)
+    startStickerScale.value = props.sticker.scale
     emit('select', props.sticker.id)
   }
   
-  window.addEventListener('touchmove', handleTouchMove, { passive: false })
-  window.addEventListener('touchend', handleTouchEnd)
+  document.addEventListener('touchmove', onTouchMove, { passive: false })
+  document.addEventListener('touchend', onTouchEnd)
 }
 
-function handleMouseMove(e: MouseEvent) {
-  e.preventDefault()
+function onMouseMove(e: MouseEvent) {
   if (!isDragging.value && !isResizing.value && !isRotating.value) return
   
-  const pos = getEventPosition(e)
+  const pos = getClientPos(e)
   
   if (isDragging.value) {
-    const dx = pos.x - dragStartX.value
-    const dy = pos.y - dragStartY.value
+    const deltaX = pos.x - startClientX.value
+    const deltaY = pos.y - startClientY.value
     
-    let newX = initialX.value + dx
-    let newY = initialY.value + dy
+    const newX = startStickerX.value + deltaX
+    const newY = startStickerY.value + deltaY
     
-    const clamped = clampPosition(newX, newY)
-    
-    emit('update', {
-      x: clamped.x,
-      y: clamped.y,
-    })
+    emitUpdate({ x: newX, y: newY })
   }
   
   if (isResizing.value && resizeHandle.value) {
-    const dx = pos.x - dragStartX.value
-    const dy = pos.y - dragStartY.value
-    const distance = Math.sqrt(dx * dx + dy * dy)
-    const scaleChange = distance / 100
+    const deltaX = pos.x - startClientX.value
+    const deltaY = pos.y - startClientY.value
+    const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY)
+    const scaleDelta = distance / 100
     
     let newScale: number
     if (resizeHandle.value === 'bottom-right' || resizeHandle.value === 'top-left') {
-      newScale = initialScale.value + scaleChange
+      newScale = startStickerScale.value + scaleDelta
     } else {
-      newScale = initialScale.value - scaleChange
+      newScale = startStickerScale.value - scaleDelta
     }
     
     newScale = Math.max(0.2, Math.min(3, newScale))
-    
-    emit('update', {
-      scale: newScale,
-    })
+    emitUpdate({ scale: newScale })
   }
   
   if (isRotating.value) {
-    const cx = initialX.value + (40 * initialScale.value) / 2
-    const cy = initialY.value + (40 * initialScale.value) / 2
+    const cx = startStickerX.value + (40 * startStickerScale.value) / 2
+    const cy = startStickerY.value + (40 * startStickerScale.value) / 2
     
-    const angleStart = Math.atan2(dragStartY.value - cy, dragStartX.value - cx)
+    const angleStart = Math.atan2(startClientY.value - cy, startClientX.value - cx)
     const angleCurrent = Math.atan2(pos.y - cy, pos.x - cx)
     
-    let angleDiff = (angleCurrent - angleStart) * (180 / Math.PI)
-    
-    emit('update', {
-      rotation: initialRotation.value + angleDiff,
-    })
+    const angleDelta = (angleCurrent - angleStart) * (180 / Math.PI)
+    emitUpdate({ rotation: startStickerRotation.value + angleDelta })
   }
 }
 
-function handleTouchMove(e: TouchEvent) {
-  e.preventDefault()
+function onTouchMove(e: TouchEvent) {
   if (e.touches.length === 1 && isDragging.value) {
-    const pos = getEventPosition(e)
-    const dx = pos.x - dragStartX.value
-    const dy = pos.y - dragStartY.value
+    e.preventDefault()
+    const pos = getClientPos(e)
+    const deltaX = pos.x - startClientX.value
+    const deltaY = pos.y - startClientY.value
     
-    let newX = initialX.value + dx
-    let newY = initialY.value + dy
+    const newX = startStickerX.value + deltaX
+    const newY = startStickerY.value + deltaY
     
-    const clamped = clampPosition(newX, newY)
-    
-    emit('update', {
-      x: clamped.x,
-      y: clamped.y,
-    })
+    emitUpdate({ x: newX, y: newY })
   } else if (e.touches.length === 2 && isResizing.value) {
+    e.preventDefault()
     const dx = e.touches[0].clientX - e.touches[1].clientX
     const dy = e.touches[0].clientY - e.touches[1].clientY
     const currentDistance = Math.sqrt(dx * dx + dy * dy)
     
-    const scaleRatio = currentDistance / initialDistance.value
-    let newScale = initialScale.value * scaleRatio
+    const scaleRatio = currentDistance / pinchStartDistance.value
+    let newScale = startStickerScale.value * scaleRatio
     newScale = Math.max(0.2, Math.min(3, newScale))
-    
-    emit('update', {
-      scale: newScale,
-    })
+    emitUpdate({ scale: newScale })
   }
 }
 
-function handleMouseUp() {
+function onMouseUp() {
   isDragging.value = false
   isResizing.value = false
   isRotating.value = false
   resizeHandle.value = null
   
-  window.removeEventListener('mousemove', handleMouseMove)
-  window.removeEventListener('mouseup', handleMouseUp)
+  document.removeEventListener('mousemove', onMouseMove)
+  document.removeEventListener('mouseup', onMouseUp)
 }
 
-function handleTouchEnd() {
+function onTouchEnd() {
   isDragging.value = false
   isResizing.value = false
   isRotating.value = false
   resizeHandle.value = null
   
-  window.removeEventListener('touchmove', handleTouchMove)
-  window.removeEventListener('touchend', handleTouchEnd)
+  document.removeEventListener('touchmove', onTouchMove)
+  document.removeEventListener('touchend', onTouchEnd)
 }
 
-function handleResizeStart(
-  e: MouseEvent | TouchEvent,
-  handle: string
-) {
-  e.preventDefault()
-  const pos = getEventPosition(e)
+function onResizeStart(e: MouseEvent | TouchEvent, handle: string) {
+  const pos = getClientPos(e)
   isResizing.value = true
   resizeHandle.value = handle
-  dragStartX.value = pos.x
-  dragStartY.value = pos.y
-  initialScale.value = props.sticker.scale
+  startClientX.value = pos.x
+  startClientY.value = pos.y
+  startStickerScale.value = props.sticker.scale
 }
 
-function handleRotateStart(e: MouseEvent | TouchEvent) {
-  e.preventDefault()
-  const pos = getEventPosition(e)
+function onRotateStart(e: MouseEvent | TouchEvent) {
+  const pos = getClientPos(e)
   isRotating.value = true
-  dragStartX.value = pos.x
-  dragStartY.value = pos.y
-  initialX.value = props.sticker.x
-  initialY.value = props.sticker.y
-  initialScale.value = props.sticker.scale
-  initialRotation.value = props.sticker.rotation
+  startClientX.value = pos.x
+  startClientY.value = pos.y
+  startStickerX.value = props.sticker.x
+  startStickerY.value = props.sticker.y
+  startStickerScale.value = props.sticker.scale
+  startStickerRotation.value = props.sticker.rotation
 }
 
-function handleRemove() {
+function onRemove() {
   emit('remove', props.sticker.id)
 }
 
 onUnmounted(() => {
-  window.removeEventListener('mousemove', handleMouseMove)
-  window.removeEventListener('mouseup', handleMouseUp)
-  window.removeEventListener('touchmove', handleTouchMove)
-  window.removeEventListener('touchend', handleTouchEnd)
+  document.removeEventListener('mousemove', onMouseMove)
+  document.removeEventListener('mouseup', onMouseUp)
+  document.removeEventListener('touchmove', onTouchMove)
+  document.removeEventListener('touchend', onTouchEnd)
 })
 </script>
 
@@ -361,6 +317,7 @@ onUnmounted(() => {
   user-select: none;
   touch-action: none;
   transition: box-shadow 0.2s;
+  box-sizing: border-box;
 
   &.is-selected {
     box-shadow: 0 0 0 2px #506af4;
@@ -374,6 +331,7 @@ onUnmounted(() => {
     :deep(svg) {
       width: 100%;
       height: 100%;
+      display: block;
     }
   }
 }
@@ -387,6 +345,7 @@ onUnmounted(() => {
   border-radius: 50%;
   cursor: pointer;
   z-index: 10;
+  box-sizing: border-box;
 
   &--top-left {
     top: -6px;
@@ -451,6 +410,7 @@ onUnmounted(() => {
   cursor: pointer;
   z-index: 10;
   transition: transform 0.2s;
+  box-sizing: border-box;
 
   &:hover {
     transform: scale(1.2);
