@@ -358,10 +358,7 @@ watchEffect(async () => {
       const shape = sticker.shape as StickerShape
       if (widgetData?.[WidgetType.Stickers]?.[shape]) {
         const svgRaw = (await widgetData[WidgetType.Stickers][shape]()).default
-        const content = svgRaw
-          .slice(svgRaw.indexOf('>', svgRaw.indexOf('<svg')) + 1)
-          .replace('</svg>', '')
-        stickerSvgs.value.set(sticker.id, content)
+        stickerSvgs.value.set(sticker.id, svgRaw)
       }
     }
   }
