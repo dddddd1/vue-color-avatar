@@ -9,6 +9,8 @@ import {
   GlassesShape,
   MouthShape,
   NoseShape,
+  StickerCategory,
+  StickerShape,
   TopsShape,
   WidgetType,
 } from '../enums'
@@ -16,6 +18,14 @@ import {
 /** @internal */
 type Data = Readonly<{
   [key in `${WidgetType}`]: {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    [key in string]: () => Promise<any>
+  }
+}>
+
+/** @internal */
+type StickerData = Readonly<{
+  [key in `${StickerCategory}`]: {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     [key in string]: () => Promise<any>
   }
@@ -193,4 +203,33 @@ const previewData: Data = {
   },
 }
 
-export { previewData, widgetData }
+const stickerData: StickerData = {
+  [StickerCategory.SpringFestival]: {
+    [StickerShape.Lantern]: () =>
+      import(`../assets/stickers/springFestival/lantern.svg?raw`),
+    [StickerShape.Firecracker]: () =>
+      import(`../assets/stickers/springFestival/firecracker.svg?raw`),
+    [StickerShape.Couplet]: () =>
+      import(`../assets/stickers/springFestival/couplet.svg?raw`),
+    [StickerShape.Fu]: () =>
+      import(`../assets/stickers/springFestival/fu.svg?raw`),
+  },
+  [StickerCategory.MidAutumn]: {
+    [StickerShape.Mooncake]: () =>
+      import(`../assets/stickers/midAutumn/mooncake.svg?raw`),
+    [StickerShape.Rabbit]: () =>
+      import(`../assets/stickers/midAutumn/rabbit.svg?raw`),
+    [StickerShape.Star]: () =>
+      import(`../assets/stickers/midAutumn/star.svg?raw`),
+  },
+  [StickerCategory.NationalDay]: {
+    [StickerShape.Flag]: () =>
+      import(`../assets/stickers/nationalDay/flag.svg?raw`),
+    [StickerShape.Tiananmen]: () =>
+      import(`../assets/stickers/nationalDay/tiananmen.svg?raw`),
+    [StickerShape.Star]: () =>
+      import(`../assets/stickers/nationalDay/star.svg?raw`),
+  },
+}
+
+export { previewData, stickerData, widgetData }

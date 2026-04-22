@@ -140,6 +140,8 @@ export function getRandomAvatarOption(
         fillColor: getRandomFillColor(),
       },
     },
+
+    stickers: [],
   }
 
   return avatarOption

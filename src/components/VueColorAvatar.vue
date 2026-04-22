@@ -13,6 +13,19 @@
 
     <div class="avatar-payload" v-html="svgContent" />
 
+    <div class="stickers-layer">
+      <StickerComponent
+        v-for="sticker in sortedStickers"
+        :key="sticker.id"
+        :sticker="sticker"
+        :is-selected="selectedStickerId === sticker.id"
+        :avatar-size="avatarSize"
+        @update="(data) => handleStickerUpdate(sticker.id, data)"
+        @select="handleStickerSelect"
+        @remove="handleStickerRemove"
+      />
+    </div>
+
     <Border
       :color="avatarOption.background.borderColor"
       :radius="getWrapperShapeStyle().borderRadius"
@@ -27,16 +40,17 @@ export interface VueColorAvatarRef {
 </script>
 
 <script lang="ts" setup>
-import { ref, toRefs, watchEffect } from 'vue'
+import { computed, ref, toRefs, watchEffect } from 'vue'
 
 import { WidgetType, WrapperShape } from '@/enums'
-import type { AvatarOption } from '@/types'
+import type { AvatarOption, Sticker } from '@/types'
 import { getRandomAvatarOption } from '@/utils'
 import { AVATAR_LAYER, NONE, SHAPE_STYLE_SET } from '@/utils/constant'
 import { widgetData } from '@/utils/dynamic-data'
 
 import Background from './widgets/Background.vue'
 import Border from './widgets/Border.vue'
+import StickerComponent from './stickers/Sticker.vue'
 
 interface VueColorAvatarProps {
   option: AvatarOption
@@ -51,8 +65,20 @@ const props = withDefaults(defineProps<VueColorAvatarProps>(), {
 const { option: avatarOption, size: avatarSize } = toRefs(props)
 
 const avatarRef = ref<VueColorAvatarRef['avatarRef']>()
+const selectedStickerId = ref<string | null>(null)
+
+const emit = defineEmits<{
+  (e: 'stickerUpdate', stickers: Sticker[]): void
+  (e: 'stickerSelect', stickerId: string | null): void
+}>()
 
 defineExpose({ avatarRef })
+
+const sortedStickers = computed(() => {
+  return [...(avatarOption.value.stickers || [])].sort(
+    (a, b) => a.zIndex - b.zIndex
+  )
+})
 
 function getWrapperShapeClassName() {
   return {
@@ -69,6 +95,29 @@ function getWrapperShapeStyle() {
   return SHAPE_STYLE_SET[avatarOption.value.wrapperShape ?? WrapperShape.Circle]
 }
 
+function handleStickerUpdate(stickerId: string, data: Partial<Sticker>) {
+  const updatedStickers = avatarOption.value.stickers.map((sticker) =>
+    sticker.id === stickerId ? { ...sticker, ...data } : sticker
+  )
+  emit('stickerUpdate', updatedStickers)
+}
+
+function handleStickerSelect(stickerId: string) {
+  selectedStickerId.value = stickerId
+  emit('stickerSelect', stickerId)
+}
+
+function handleStickerRemove(stickerId: string) {
+  const updatedStickers = avatarOption.value.stickers.filter(
+    (s) => s.id !== stickerId
+  )
+  emit('stickerUpdate', updatedStickers)
+  if (selectedStickerId.value === stickerId) {
+    selectedStickerId.value = null
+    emit('stickerSelect', null)
+  }
+}
+
 const svgContent = ref('')
 
 watchEffect(async () => {
@@ -79,12 +128,6 @@ watchEffect(async () => {
       return ix - iix
     }
   )
-
-  // const promises: Promise<string>[] = sortedList.map(async ([widgetType, opt]) => {
-  //   return (
-  //     await import(`../assets/widgets/${widgetType}/${opt.shape}.svg?raw`)
-  //   ).default
-  // })
 
   const promises: Promise<string>[] = sortedList.map(
     async ([widgetType, opt]) => {
@@ -149,6 +192,20 @@ watchEffect(async () => {
     z-index: 2;
     width: 100%;
     height: 100%;
+  }
+
+  .stickers-layer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 3;
+    pointer-events: none;
+
+    > * {
+      pointer-events: auto;
+    }
   }
 }
 </style>

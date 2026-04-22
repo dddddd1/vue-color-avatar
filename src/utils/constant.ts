@@ -12,6 +12,8 @@ import {
   GlassesShape,
   MouthShape,
   NoseShape,
+  StickerCategory,
+  StickerShape,
   TopsShape,
   WidgetType,
   WrapperShape,
@@ -53,6 +55,10 @@ export const AVATAR_LAYER: Readonly<{
   [WidgetType.Clothes]: {
     zIndex: 110,
   },
+}
+
+export const STICKER_LAYER = {
+  baseZIndex: 200,
 }
 
 export const SETTINGS: Readonly<AvatarSettings> = {
@@ -102,6 +108,29 @@ export const SETTINGS: Readonly<AvatarSettings> = {
 
   get borderColor() {
     return [...this.commonColors, 'transparent']
+  },
+
+  stickerCategories: Object.values(StickerCategory),
+
+  get stickersByCategory() {
+    return {
+      [StickerCategory.SpringFestival]: [
+        StickerShape.Lantern,
+        StickerShape.Firecracker,
+        StickerShape.Couplet,
+        StickerShape.Fu,
+      ],
+      [StickerCategory.MidAutumn]: [
+        StickerShape.Mooncake,
+        StickerShape.Rabbit,
+        StickerShape.Star,
+      ],
+      [StickerCategory.NationalDay]: [
+        StickerShape.Flag,
+        StickerShape.Tiananmen,
+        StickerShape.Star,
+      ],
+    }
   },
 }
 
@@ -158,6 +187,7 @@ export const SPECIAL_AVATARS: Readonly<AvatarOption[]> = [
         fillColor: '#e0ddff',
       },
     },
+    stickers: [],
   },
   {
     wrapperShape: 'squircle',
@@ -202,6 +232,7 @@ export const SPECIAL_AVATARS: Readonly<AvatarOption[]> = [
         fillColor: '#f4d150',
       },
     },
+    stickers: [],
   },
 ]
 
