@@ -30,6 +30,24 @@ export enum WidgetType {
   Clothes = 'clothes',
 }
 
+export enum StickerCategory {
+  SpringFestival = 'springFestival',
+  MidAutumn = 'midAutumn',
+  NationalDay = 'nationalDay',
+}
+
+export enum StickerShape {
+  Lantern = 'lantern',
+  Firecracker = 'firecracker',
+  Couplet = 'couplet',
+  Fu = 'fu',
+  Mooncake = 'mooncake',
+  Rabbit = 'rabbit',
+  Star = 'star',
+  Flag = 'flag',
+  Tiananmen = 'tiananmen',
+}
+
 export enum WrapperShape {
   Circle = 'circle',
   Square = 'square',

@@ -14,6 +14,8 @@ import {
   type GlassesShape,
   type MouthShape,
   type NoseShape,
+  type StickerCategory,
+  type StickerShape,
   type TopsShape,
   type WrapperShape,
 } from '../enums'
@@ -31,12 +33,24 @@ type AvatarWidgets = {
   ear: Widget<EarShape>
   earrings: Widget<EarringsShape>
   eyebrows: Widget<EyebrowsShape>
-  glasses: Widget<GlassesShape>
   eyes: Widget<EyesShape>
   nose: Widget<NoseShape>
+  glasses: Widget<GlassesShape>
   mouth: Widget<MouthShape>
   beard: Widget<BeardShape>
   clothes: Widget<ClothesShape>
+}
+
+export interface Sticker {
+  id: string
+  shape: StickerShape
+  category: StickerCategory
+  x: number
+  y: number
+  scale: number
+  rotation: number
+  zIndex: number
+  opacity: number
 }
 
 export interface AvatarOption {
@@ -50,6 +64,8 @@ export interface AvatarOption {
   }
 
   widgets: Partial<AvatarWidgets>
+
+  stickers: Sticker[]
 }
 
 export interface AvatarSettings {
@@ -72,4 +88,9 @@ export interface AvatarSettings {
   skinColors: string[]
   backgroundColor: string[]
   borderColor: string[]
+
+  stickerCategories: StickerCategory[]
+  stickersByCategory: {
+    [key in StickerCategory]: StickerShape[]
+  }
 }

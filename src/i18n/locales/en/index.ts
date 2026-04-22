@@ -1,4 +1,4 @@
-import { WidgetType } from '@/enums'
+import { StickerCategory, StickerShape, WidgetType } from '@/enums'
 
 export const en = {
   action: {
@@ -13,12 +13,22 @@ export const en = {
     copied: 'Copied',
     downloading: 'Downloading',
     close: 'Close',
+    removeSticker: 'Remove Sticker',
+    clearStickers: 'Clear All',
   },
   label: {
     wrapperShape: 'Avatar Shape',
     borderColor: 'Border Color',
     backgroundColor: 'Background Color',
     colors: 'colors',
+    stickers: 'Festival Stickers',
+    stickerControls: 'Sticker Controls',
+    stickerX: 'X Position',
+    stickerY: 'Y Position',
+    stickerScale: 'Scale',
+    stickerRotation: 'Rotation',
+    stickerOpacity: 'Opacity',
+    appliedStickers: 'Applied Stickers',
   },
   widgetType: {
     [WidgetType.Face]: 'Face',
@@ -32,6 +42,22 @@ export const en = {
     [WidgetType.Mouth]: 'Mouth',
     [WidgetType.Beard]: 'Beard',
     [WidgetType.Clothes]: 'Clothes',
+  },
+  stickerCategory: {
+    [StickerCategory.SpringFestival]: 'Spring Festival',
+    [StickerCategory.MidAutumn]: 'Mid-Autumn',
+    [StickerCategory.NationalDay]: 'National Day',
+  },
+  stickerShape: {
+    [StickerShape.Lantern]: 'Lantern',
+    [StickerShape.Firecracker]: 'Firecracker',
+    [StickerShape.Couplet]: 'Couplet',
+    [StickerShape.Fu]: 'Fu Character',
+    [StickerShape.Mooncake]: 'Mooncake',
+    [StickerShape.Rabbit]: 'Rabbit',
+    [StickerShape.Star]: 'Star',
+    [StickerShape.Flag]: 'Flag',
+    [StickerShape.Tiananmen]: 'Tiananmen',
   },
   wrapperShape: {
     circle: 'Circle',

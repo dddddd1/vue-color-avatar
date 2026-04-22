@@ -1,4 +1,4 @@
-import { WidgetType } from '@/enums'
+import { StickerCategory, StickerShape, WidgetType } from '@/enums'
 
 export const zh = {
   action: {
@@ -13,12 +13,22 @@ export const zh = {
     copied: '已复制',
     downloading: '准备下载',
     close: '关闭',
+    removeSticker: '移除贴纸',
+    clearStickers: '清除全部',
   },
   label: {
     wrapperShape: '头像形状',
     borderColor: '边框颜色',
     backgroundColor: '背景颜色',
     colors: '颜色',
+    stickers: '节日贴纸',
+    stickerControls: '贴纸调整',
+    stickerX: 'X位置',
+    stickerY: 'Y位置',
+    stickerScale: '缩放',
+    stickerRotation: '旋转',
+    stickerOpacity: '透明度',
+    appliedStickers: '已应用的贴纸',
   },
   widgetType: {
     [WidgetType.Face]: '脸蛋',
@@ -32,6 +42,22 @@ export const zh = {
     [WidgetType.Mouth]: '嘴巴',
     [WidgetType.Beard]: '胡子',
     [WidgetType.Clothes]: '衣着',
+  },
+  stickerCategory: {
+    [StickerCategory.SpringFestival]: '春节',
+    [StickerCategory.MidAutumn]: '中秋',
+    [StickerCategory.NationalDay]: '国庆',
+  },
+  stickerShape: {
+    [StickerShape.Lantern]: '红灯笼',
+    [StickerShape.Firecracker]: '鞭炮',
+    [StickerShape.Couplet]: '对联',
+    [StickerShape.Fu]: '福字',
+    [StickerShape.Mooncake]: '月饼',
+    [StickerShape.Rabbit]: '玉兔',
+    [StickerShape.Star]: '星星',
+    [StickerShape.Flag]: '国旗',
+    [StickerShape.Tiananmen]: '天安门',
   },
   wrapperShape: {
     circle: '圆形',

@@ -112,6 +112,15 @@
           />
         </ul>
       </SectionWrapper>
+
+      <StickerConfigurator
+        :stickers="avatarOption.stickers"
+        :selected-sticker-id="selectedStickerId"
+        @sticker-add="(s) => emit('stickerAdd', s)"
+        @sticker-update="(stickers) => emit('stickerUpdate', stickers)"
+        @sticker-remove="(id) => emit('stickerRemove', id)"
+        @sticker-clear="() => emit('stickerClear')"
+      />
     </div>
   </PerfectScrollbar>
 </template>
@@ -122,15 +131,32 @@ import { useI18n } from 'vue-i18n'
 
 import PerfectScrollbar from '@/components/PerfectScrollbar.vue'
 import SectionWrapper from '@/components/SectionWrapper.vue'
+import StickerConfigurator from '@/components/stickers/StickerConfigurator.vue'
 import {
   type WidgetShape,
   type WrapperShape,
   BeardShape,
   WidgetType,
 } from '@/enums'
+import type { Sticker } from '@/types'
 import { useAvatarOption } from '@/hooks'
 import { AVATAR_LAYER, SETTINGS } from '@/utils/constant'
 import { previewData } from '@/utils/dynamic-data'
+
+interface ConfiguratorProps {
+  selectedStickerId?: string | null
+}
+
+const props = withDefaults(defineProps<ConfiguratorProps>(), {
+  selectedStickerId: null,
+})
+
+const emit = defineEmits<{
+  (e: 'stickerAdd', sticker: Sticker): void
+  (e: 'stickerUpdate', stickers: Sticker[]): void
+  (e: 'stickerRemove', stickerId: string): void
+  (e: 'stickerClear'): void
+}>()
 
 const { t } = useI18n()
 

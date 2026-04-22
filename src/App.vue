@@ -14,6 +14,8 @@
                 :style="{
                   transform: `rotateY(${flipped ? -180 : 0}deg)`,
                 }"
+                @sticker-update="handleStickerUpdate"
+                @sticker-select="handleStickerSelect"
               />
             </div>
 
@@ -79,7 +81,13 @@
     />
 
     <Sider>
-      <Configurator />
+      <Configurator
+        :selected-sticker-id="selectedStickerId"
+        @sticker-add="handleStickerAdd"
+        @sticker-update="handleStickerUpdate"
+        @sticker-remove="handleStickerRemove"
+        @sticker-clear="handleStickerClear"
+      />
     </Sider>
   </main>
 </template>
@@ -118,7 +126,7 @@ import { recordEvent } from '@/utils/ga'
 
 import { name as appName } from '../package.json'
 import ConfettiCanvas from './components/ConfettiCanvas.vue'
-import type { AvatarOption } from './types'
+import type { AvatarOption, Sticker } from './types'
 
 const store = useStore()
 
@@ -127,6 +135,7 @@ const [avatarOption, setAvatarOption] = useAvatarOption()
 const { t } = useI18n()
 
 const colorAvatarRef = ref<VueColorAvatarRef>()
+const selectedStickerId = ref<string | null>(null)
 
 function handleGenerate() {
   if (Math.random() <= TRIGGER_PROBABILITY) {
@@ -266,6 +275,47 @@ async function generateMultiple(count = 5 * 6) {
   recordEvent('click_generate_multiple', {
     event_category: 'click',
   })
+}
+
+function handleStickerSelect(stickerId: string | null) {
+  selectedStickerId.value = stickerId
+}
+
+function handleStickerUpdate(stickers: Sticker[]) {
+  setAvatarOption({
+    ...avatarOption.value,
+    stickers,
+  })
+}
+
+function handleStickerAdd(sticker: Sticker) {
+  const newStickers = [...avatarOption.value.stickers, sticker]
+  setAvatarOption({
+    ...avatarOption.value,
+    stickers: newStickers,
+  })
+  selectedStickerId.value = sticker.id
+}
+
+function handleStickerRemove(stickerId: string) {
+  const newStickers = avatarOption.value.stickers.filter(
+    (s) => s.id !== stickerId
+  )
+  setAvatarOption({
+    ...avatarOption.value,
+    stickers: newStickers,
+  })
+  if (selectedStickerId.value === stickerId) {
+    selectedStickerId.value = null
+  }
+}
+
+function handleStickerClear() {
+  setAvatarOption({
+    ...avatarOption.value,
+    stickers: [],
+  })
+  selectedStickerId.value = null
 }
 </script>
 
