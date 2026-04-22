@@ -1,4 +1,4 @@
-import { WidgetType } from '@/enums'
+import { FestivalType, StickerShape, WidgetType } from '@/enums'
 
 export const zh = {
   action: {
@@ -13,12 +13,20 @@ export const zh = {
     copied: '已复制',
     downloading: '准备下载',
     close: '关闭',
+    applyAllFestival: '一键应用节日贴纸',
+    reset: '重置',
   },
   label: {
     wrapperShape: '头像形状',
     borderColor: '边框颜色',
     backgroundColor: '背景颜色',
     colors: '颜色',
+    festivalStickers: '节日贴纸',
+    appliedStickers: '已应用贴纸',
+    positionX: '位置 X',
+    positionY: '位置 Y',
+    scale: '缩放',
+    rotation: '旋转',
   },
   widgetType: {
     [WidgetType.Face]: '脸蛋',
@@ -32,6 +40,22 @@ export const zh = {
     [WidgetType.Mouth]: '嘴巴',
     [WidgetType.Beard]: '胡子',
     [WidgetType.Clothes]: '衣着',
+  },
+  festival: {
+    [FestivalType.SpringFestival]: '春节',
+    [FestivalType.MidAutumnFestival]: '中秋',
+    [FestivalType.NationalDay]: '国庆',
+  },
+  sticker: {
+    [StickerShape.RedLantern]: '红灯笼',
+    [StickerShape.Firecracker]: '鞭炮',
+    [StickerShape.FuCharacter]: '福字',
+    [StickerShape.Mooncake]: '月饼',
+    [StickerShape.Rabbit]: '兔子',
+    [StickerShape.Osmanthus]: '桂花',
+    [StickerShape.NationalFlag]: '国旗',
+    [StickerShape.Tiananmen]: '天安门',
+    [StickerShape.Fireworks]: '烟花',
   },
   wrapperShape: {
     circle: '圆形',

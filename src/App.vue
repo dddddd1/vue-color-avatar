@@ -14,6 +14,8 @@
                 :style="{
                   transform: `rotateY(${flipped ? -180 : 0}deg)`,
                 }"
+                @update:sticker="handleUpdateSticker"
+                @select:sticker="handleSelectSticker"
               />
             </div>
 
@@ -103,7 +105,7 @@ import Footer from '@/layouts/Footer.vue'
 import Header from '@/layouts/Header.vue'
 import Sider from '@/layouts/Sider.vue'
 import { useStore } from '@/store'
-import { REDO, UNDO } from '@/store/mutation-type'
+import { REDO, UNDO, UPDATE_STICKER } from '@/store/mutation-type'
 import {
   getRandomAvatarOption,
   getSpecialAvatarOption,
@@ -118,7 +120,7 @@ import { recordEvent } from '@/utils/ga'
 
 import { name as appName } from '../package.json'
 import ConfettiCanvas from './components/ConfettiCanvas.vue'
-import type { AvatarOption } from './types'
+import type { AvatarOption, Sticker } from './types'
 
 const store = useStore()
 
@@ -232,6 +234,14 @@ function handleAction(actionType: ActionType) {
 
 const avatarListVisible = ref(false)
 const avatarList = ref<AvatarOption[]>([])
+
+function handleUpdateSticker(sticker: Partial<Sticker> & { id: string }) {
+  store[UPDATE_STICKER](sticker)
+}
+
+function handleSelectSticker(_stickerId: string | null) {
+  // 可以在这里处理贴纸选中的逻辑，比如同步到 StickerManager
+}
 
 watchEffect(() => {
   avatarListVisible.value =

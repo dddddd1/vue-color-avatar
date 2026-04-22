@@ -9,6 +9,7 @@ import {
   GlassesShape,
   MouthShape,
   NoseShape,
+  StickerShape,
   TopsShape,
   WidgetType,
 } from '../enums'
@@ -105,6 +106,27 @@ const widgetData: Data = {
     [TopsShape.Turban]: () => import(`../assets/widgets/tops/turban.svg?raw`),
     [TopsShape.Wave]: () => import(`../assets/widgets/tops/wave.svg?raw`),
   },
+
+  [WidgetType.Stickers]: {
+    [StickerShape.RedLantern]: () =>
+      import(`../assets/widgets/stickers/redLantern.svg?raw`),
+    [StickerShape.Firecracker]: () =>
+      import(`../assets/widgets/stickers/firecracker.svg?raw`),
+    [StickerShape.FuCharacter]: () =>
+      import(`../assets/widgets/stickers/fuCharacter.svg?raw`),
+    [StickerShape.Mooncake]: () =>
+      import(`../assets/widgets/stickers/mooncake.svg?raw`),
+    [StickerShape.Rabbit]: () =>
+      import(`../assets/widgets/stickers/rabbit.svg?raw`),
+    [StickerShape.Osmanthus]: () =>
+      import(`../assets/widgets/stickers/osmanthus.svg?raw`),
+    [StickerShape.NationalFlag]: () =>
+      import(`../assets/widgets/stickers/nationalFlag.svg?raw`),
+    [StickerShape.Tiananmen]: () =>
+      import(`../assets/widgets/stickers/tiananmen.svg?raw`),
+    [StickerShape.Fireworks]: () =>
+      import(`../assets/widgets/stickers/fireworks.svg?raw`),
+  },
 }
 
 const previewData: Data = {
@@ -190,6 +212,27 @@ const previewData: Data = {
     [TopsShape.Punk]: () => import(`../assets/preview/tops/punk.svg?raw`),
     [TopsShape.Turban]: () => import(`../assets/preview/tops/turban.svg?raw`),
     [TopsShape.Wave]: () => import(`../assets/preview/tops/wave.svg?raw`),
+  },
+
+  [WidgetType.Stickers]: {
+    [StickerShape.RedLantern]: () =>
+      import(`../assets/preview/stickers/redLantern.svg?raw`),
+    [StickerShape.Firecracker]: () =>
+      import(`../assets/preview/stickers/firecracker.svg?raw`),
+    [StickerShape.FuCharacter]: () =>
+      import(`../assets/preview/stickers/fuCharacter.svg?raw`),
+    [StickerShape.Mooncake]: () =>
+      import(`../assets/preview/stickers/mooncake.svg?raw`),
+    [StickerShape.Rabbit]: () =>
+      import(`../assets/preview/stickers/rabbit.svg?raw`),
+    [StickerShape.Osmanthus]: () =>
+      import(`../assets/preview/stickers/osmanthus.svg?raw`),
+    [StickerShape.NationalFlag]: () =>
+      import(`../assets/preview/stickers/nationalFlag.svg?raw`),
+    [StickerShape.Tiananmen]: () =>
+      import(`../assets/preview/stickers/tiananmen.svg?raw`),
+    [StickerShape.Fireworks]: () =>
+      import(`../assets/preview/stickers/fireworks.svg?raw`),
   },
 }
 

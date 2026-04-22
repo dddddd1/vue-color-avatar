@@ -112,6 +112,8 @@
           />
         </ul>
       </SectionWrapper>
+
+      <StickerManager ref="stickerManagerRef" />
     </div>
   </PerfectScrollbar>
 </template>
@@ -122,6 +124,7 @@ import { useI18n } from 'vue-i18n'
 
 import PerfectScrollbar from '@/components/PerfectScrollbar.vue'
 import SectionWrapper from '@/components/SectionWrapper.vue'
+import type StickerManager from '@/components/StickerManager.vue'
 import {
   type WidgetShape,
   type WrapperShape,
@@ -136,7 +139,11 @@ const { t } = useI18n()
 
 const [avatarOption, setAvatarOption] = useAvatarOption()
 
-const sectionList = reactive(Object.values(WidgetType))
+const stickerManagerRef = ref<InstanceType<typeof StickerManager> | null>(null)
+
+const sectionList = reactive(
+  Object.values(WidgetType).filter((type) => type !== WidgetType.Stickers)
+)
 const sections = ref<
   {
     widgetType: WidgetType

@@ -10,10 +10,12 @@ import {
   type EyebrowsShape,
   type EyesShape,
   type FaceShape,
+  type FestivalType,
   type Gender,
   type GlassesShape,
   type MouthShape,
   type NoseShape,
+  type StickerShape,
   type TopsShape,
   type WrapperShape,
 } from '../enums'
@@ -23,6 +25,18 @@ interface Widget<Shape> {
   zIndex?: number
   fillColor?: string
   strokeColor?: string
+}
+
+export interface Sticker {
+  id: string
+  shape: StickerShape
+  festival: FestivalType
+  x: number
+  y: number
+  scale: number
+  rotation: number
+  zIndex: number
+  visible: boolean
 }
 
 type AvatarWidgets = {
@@ -50,6 +64,7 @@ export interface AvatarOption {
   }
 
   widgets: Partial<AvatarWidgets>
+  stickers: Sticker[]
 }
 
 export interface AvatarSettings {
@@ -67,6 +82,7 @@ export interface AvatarSettings {
   beardShape: BeardShape[]
   glassesShape: GlassesShape[]
   clothesShape: ClothesShape[]
+  stickersShape: StickerShape[]
 
   commonColors: string[]
   skinColors: string[]

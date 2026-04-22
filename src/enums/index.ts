@@ -28,6 +28,25 @@ export enum WidgetType {
   Mouth = 'mouth',
   Beard = 'beard',
   Clothes = 'clothes',
+  Stickers = 'stickers',
+}
+
+export enum FestivalType {
+  SpringFestival = 'springFestival',
+  MidAutumnFestival = 'midAutumnFestival',
+  NationalDay = 'nationalDay',
+}
+
+export enum StickerShape {
+  RedLantern = 'redLantern',
+  Firecracker = 'firecracker',
+  FuCharacter = 'fuCharacter',
+  Mooncake = 'mooncake',
+  Rabbit = 'rabbit',
+  Osmanthus = 'osmanthus',
+  NationalFlag = 'nationalFlag',
+  Tiananmen = 'tiananmen',
+  Fireworks = 'fireworks',
 }
 
 export enum WrapperShape {
@@ -129,3 +148,4 @@ export type WidgetShape =
   | BeardShape
   | GlassesShape
   | ClothesShape
+  | StickerShape
