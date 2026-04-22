@@ -124,7 +124,7 @@ import { useI18n } from 'vue-i18n'
 
 import PerfectScrollbar from '@/components/PerfectScrollbar.vue'
 import SectionWrapper from '@/components/SectionWrapper.vue'
-import type StickerManager from '@/components/StickerManager.vue'
+import StickerManager from '@/components/StickerManager.vue'
 import {
   type WidgetShape,
   type WrapperShape,
